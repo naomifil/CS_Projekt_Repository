@@ -1,6 +1,8 @@
 #Requirements
 
 ## imports
-streamlit
+import streamlit
+from dotenv import load_dotenv
+import os
 
 ## APIs

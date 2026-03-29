@@ -10,4 +10,4 @@ st.write (""" Please enter your departure place, destination office and start da
 
 # How to load data from .env file
 load_dotenv()
- api_key = os.getenv("API_KEY")
+api_key = os.getenv("API_KEY")

@@ -2,13 +2,11 @@ import streamlit as st
 from api_call import fetch_air_quality
 
 st.write ("Welcome to our App")
-st.write ("This is a tool to help you book your business trip")
+st.write ("This is a tool to help you analyze health risks based on local air quality")
 
-st.write (""" Please enter your departure place, destination office and start date to get started. 
-          We'll show you your flight options. """)
 
 LOCATIONS = {
-    "Weinfelden": (9.108883, 47.567735),
+    "St.Gallen": (9.375902, 47.432292),
     "Zürich":     (8.541694, 47.376887),
     "Bern":       (7.447447, 46.947974),
     "Genf":       (6.143158, 46.204391),

@@ -1,2 +1,5 @@
 .env
 .idea/
+
+# dont add the db to git.
+*.db

@@ -1,9 +1,17 @@
 import streamlit as st
 from api_call import fetch_air_quality
+from database import create_tables
 
 st.write ("Welcome to our App")
 st.write ("This is a tool to help you analyze health risks based on local air quality")
 
+# This will create the empty database if it does not exist yet
+create_tables()
+
+# This is going to change, am still working on some improvements:
+# - Instead of multiple round-trips per location, we will identify the relevant stations manually
+#   and add them to the database. The api will then only query the stations listed in the database to optimize
+#   how many calls are needed (API Rate limit 60/min - 2000/hr).
 
 LOCATIONS = {
     "St.Gallen": (9.375902, 47.432292),

@@ -1,8 +1,10 @@
 #Requirements
 
 ## imports
-import streamlit
-from dotenv import load_dotenv
-import os
+
+streamlit
+python-dotenv
+dotenv
+openaq
 
 ## APIs

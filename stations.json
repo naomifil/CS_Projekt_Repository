@@ -1,0 +1,80 @@
+{
+  "2.3522,48.8566": [
+    {
+      "id": 4039,
+      "name": "PARIS 18eme"
+    }
+  ],
+  "8.5417,47.3769": [
+    {
+      "id": 9589,
+      "name": "Z\u00fcrich-Kaserne"
+    },
+    {
+      "id": 9591,
+      "name": "D\u00fcbendorf-EMPA"
+    }
+  ],
+  "13.405,52.52": [
+    {
+      "id": 2993,
+      "name": "Berlin Neuk\u00f6lln"
+    },
+    {
+      "id": 3096,
+      "name": "Potsdam, Gro\u00df Glienicke"
+    },
+    {
+      "id": 4582,
+      "name": "Berlin Grunewald (3.5 m)"
+    }
+  ],
+  "-0.1278,51.5074": [
+    {
+      "id": 147,
+      "name": "Greenwich - Eltham"
+    },
+    {
+      "id": 148,
+      "name": "London Bloomsbury - UKA00211"
+    },
+    {
+      "id": 150,
+      "name": "London Haringey Priory Park South - UKA00568"
+    }
+  ],
+  "8.6821,50.1109": [
+    {
+      "id": 4458,
+      "name": "Hanau"
+    },
+    {
+      "id": 4682,
+      "name": "Raunheim"
+    },
+    {
+      "id": 4758,
+      "name": "Frankfurt-H\u00f6chst"
+    }
+  ],
+  "4.3517,50.8503": [
+    {
+      "id": 3361,
+      "name": "42R841 - MECHELEN"
+    },
+    {
+      "id": 3448,
+      "name": "BETMEU1"
+    },
+    {
+      "id": 4555,
+      "name": "BETN043"
+    }
+  ],
+  "18.0686,59.3293": [
+    {
+      "id": 6161,
+      "name": "Hornsgatan"
+    }
+  ]
+}

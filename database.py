@@ -16,33 +16,31 @@ def create_tables():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         latitude REAL,
-        longitude REAL
-    )
-    """)
-
-    # Stations (actual monitoring stations)
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS stations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        location_id INTEGER,
-        station_api_id INTEGER,   -- ID from OpenAQ (or your API)
-        name TEXT,
-        latitude REAL,
         longitude REAL,
-        FOREIGN KEY (location_id) REFERENCES locations(id)
+        UNIQUE(latitude, longitude)
     )
     """)
 
-    # Air quality measurements per station
+    # location level air quality
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS air_quality (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        station_id INTEGER,
-        parameter TEXT,
-        value REAL,
-        units TEXT,
+        location_id INTEGER,
+
+        pm25 REAL,
+        pm10 REAL,
+        o3 REAL,
+
+        units_pm25 TEXT,
+        units_pm10 TEXT,
+        units_o3 TEXT,
+
+        station_count INTEGER,  -- how many stations contributed
+
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (station_id) REFERENCES stations(id)
+
+        FOREIGN KEY (location_id) REFERENCES locations(id),
+        UNIQUE(location_id, timestamp)
     )
     """)
 

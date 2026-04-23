@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd      # für Tabellen und Diagramme
+import random            # um zufällige Fake-Daten zu erzeugen
 from api_call import fetch_air_quality
 from database import create_tables
 
@@ -37,10 +39,14 @@ for name, entry in zip(LOCATIONS.keys(), results):
             st.write(f"  {param:<6} {reading["value"]:.2f} {reading["units"] or ''}")
     else:
         st.write("  No readings for requested parameters.")
-# --- Importierte Bibliotheken ---
-import streamlit as st   # für das Web-App-Interface
-import pandas as pd      # für Tabellen und Diagramme
-import random            # um zufällige Fake-Daten zu erzeugen
+
+
+
+
+
+
+
+
 
 # --- Titel ---
 st.title("🌍 Air Quality Travel App (Demo-Version)")

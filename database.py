@@ -43,6 +43,21 @@ def create_tables():
         UNIQUE(location_id, timestamp)
     )
     """)
+    # Weather (current snapshot per location)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS weather (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        location_id INTEGER,
+
+        temperature_2m REAL,
+        relative_humidity_2m REAL,
+
+        timestamp DATETIME,
+
+        FOREIGN KEY (location_id) REFERENCES locations(id),
+        UNIQUE(location_id, timestamp)
+    )
+    """)
 
     conn.commit()
     conn.close()

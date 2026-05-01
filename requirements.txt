@@ -12,5 +12,5 @@ openmeteo-requests #weather data
 requests-cache  # caching API calls (for rate limit of air quality api)
 retry-requests  # auto-retry failed request
 
-
-
+## Machine Learning
+scikit-learn

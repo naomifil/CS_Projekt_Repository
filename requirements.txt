@@ -1,10 +1,16 @@
 #Requirements
 
-## imports
+pandas # data handling
+python-dotenv # loads .env for API key
+streamlit # for app interface$
 
-streamlit
-python-dotenv
-dotenv
-openaq
+## API client
+openaq # air quality data
+openmeteo-requests #weather data
 
-## APIs
+## reliability/networking
+requests-cache  # caching API calls (for rate limit of air quality api)
+retry-requests  # auto-retry failed request
+
+
+

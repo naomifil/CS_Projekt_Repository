@@ -44,5 +44,20 @@ def create_tables():
     )
     """)
 
+    # weather_daily - historical data and forecast
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS weather_daily (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        location_id INTEGER,
+
+        date DATETIME,
+        temperature_mean REAL,
+        relative_humidity_mean REAL,
+
+        FOREIGN KEY (location_id) REFERENCES locations(id),
+        UNIQUE(location_id, date)
+    )
+    """)
+
     conn.commit()
     conn.close()

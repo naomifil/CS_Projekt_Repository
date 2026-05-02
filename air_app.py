@@ -8,6 +8,10 @@ st.set_page_config(
 seite = st.sidebar.selectbox("Wähle eine Seite aus:",
     ["Startseite", "Eingaben", "Ergebnisse", "Methodik"])
 
+
+
+
+
 if seite == "Startseite":
     st.title("Luftqualitäts-App für Reisen")
     st.header("Startseite")
@@ -30,9 +34,32 @@ if seite == "Startseite":
     st.write("Dort wird erklärt, wie die App im Hintergrund arbeitet und wie die Risikoeinschätzung berechnet wird.")
 ## ende ChatGPT text
 
+
+
+
+
 elif seite == "Eingaben":
     st.header("Eingaben")
     st.write("Hier werden Alter, Asthma-Level, Aktivitätslevel, Reisedatum und Ort eingegeben.")
+
+    alter = st.number_input("Wie alt bist du?", min_value=0, max_value=100)
+
+    asthma_level = st.selectbox(
+        "Wie stark ist dein Asthma?",
+        ["Kein Asthma", "Leicht", "Mittel", "Stark"])
+
+    aktivitaet = st.selectbox(
+        "Wie aktiv möchtest du in den Ferien sein?",
+        ["Nicht aktiv", "Aktiv", "Sehr aktiv"])
+
+    ort = st.selectbox(
+        "Wähle deinen Reiseort:",
+        ["Zürich", "Paris", "Berlin", "London", "Frankfurt", "Brüssel", "Stockholm"])
+    reise_start = st.date_input("Wann beginnt deine Reise?")
+
+    reise_ende = st.date_input("Wann endet deine Reise?", min_value=reise_start)
+
+
 
 elif seite == "Ergebnisse":
     st.header("Ergebnisse")

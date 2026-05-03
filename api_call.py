@@ -21,7 +21,7 @@ from typing import Any
 from rate_limiter import RateLimiter
 from dotenv import load_dotenv
 from openaq import OpenAQ
-
+from weather_api import fetch_weather
 
 # ---------------------------------------------------------------------------
 # DTOs
@@ -299,3 +299,16 @@ def fetch_air_quality(
                 readings=agg.readings,
             ))
         return results
+
+def fetch_weather_batch(locations):
+    results = {}
+
+    for loc in locations:
+        name = loc.get("name", f"{loc['lat']},{loc['lon']}")
+
+        results[name] = fetch_weather(
+            lat=loc["lat"],
+            lon=loc["lon"]
+        )
+
+    return results

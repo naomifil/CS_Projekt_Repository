@@ -1,7 +1,7 @@
 import json
 from database import create_tables, create_connection
-from db.locations import insert_locations
-from db.stations import insert_stations
+from custom_db.locations import insert_locations
+from custom_db.stations import insert_stations
 from ingestion.air_quality import ingest_air_quality
 from ingestion.weather import ingest_weather
 

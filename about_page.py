@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.title("About AirSense")
 
@@ -80,7 +81,7 @@ Jeder Mensch reagiert je nach Gesundheitszustand und Verhalten unterschiedlich."
 with st.expander("**Alter**"):
     st.write("""
     Das Alter beeinflusst, wie empfindlich eine Person auf Luftverschmutzung und Wetterbedingungen reagiert.
-    Wenn Kinder (unter 18 Jahren) Triggern ausgesetzt sind, entzünden sich ihre Lungen und Atemwege leichter. 
+    Wenn Kinder (unter 14 Jahren) Triggern ausgesetzt sind, entzünden sich ihre Lungen und Atemwege leichter. 
     Ältere Erwachsene (ab 65 Jahren) reagieren empfindlicher auf Asthmaauslöser, da die Lungenfunktion mit zunehmendem Alter abnimmt 
     und die Symptome schlimmer sind oder schwieriger zu behandeln sein können.
     """)
@@ -120,4 +121,66 @@ with st.expander("**Asthma-Schweregrade**"):
            - Symptome während dem Tag treten den ganzen Tag über an, Symptome in der Nacht sind häufig
            - Starke Einschränkung der alltäglichen Aktivitäten
            """)
+
+st.divider()
+
+st.header("Berechnung des Risk-Scores")
+with st.expander("**Umweltfaktoren**"):
+
+    st.write("""
+    - PM2.5
+    - PM10 
+    - O3
+    - Temperatur
+    - Luftfeuchtigkeit
+    """)
+
+    st.write("Jeder Faktor wird in einen Punktwert zwischen 0 und 100 umgerechnet, je nachdem, wie schädlich der gemessene Wert ist.")
+
+    st.write("**Gewichtung**")
+    st.write("Nicht alle Faktoren sind gleich wichtig:")
+    st.write("""
+    - PM2,5 → stärkster Einfluss (Faktor von 10)
+    - Ozon → hoher Einfluss (Faktor von 8)
+    - PM10 → mittlerer Einfluss (Faktor von 5)
+    - Temperatur → geringerer Einfluss (Faktor von 3)
+    - Luftfeuchtigkeit → geringster Einfluss (Faktor von 1)
+    """)
+
+    #WHERE IS THE INFO THAT SAYS WHY SOME ARE WORSE
+
+with st.expander("**Persönliche Faktoren**"):
+
+    st.write("Der Wert wird anhand folgender Faktoren angepasst:")
+
+    st.write("**Alter**")
+    st.write("""
+    - Kind → 0-14 (Faktor von 3)
+    - Erwachsener → 15-65 (Faktor von 1)
+    - Senioren → > 65 (Faktor von 1.8)
+    """)
+
+    st.write("**Aktivität**")
+    st.write("""
+    - Innenraum (Faktor von 1)
+    - Draussen leichte Aktivität (Faktor von 1.5)
+    - Draussen intensive Aktivität (Faktor von 5) 
+    """)
+
+    st.write("**Asthmaschweregrade**")
+    st.write("""
+    - Intermittierend (Faktor von 1)
+    - Mild persistent (Faktor von 1.5)
+    - Moderat persistent (Faktor von 2.5)
+    - Schwer persistent (Faktor von 4)
+    """)
+
+with st.expander("**Endergebnis**"):
+        st.write("Alle Punkte werden mit ihren Gewichten multipliziert und zu einer Gesamtrisikobewertung zusammengerechnet.")
+
+st.subheader("Risk Thresholds")
+
+st.write("MAKE COLOR FOR RISK SCORE")
+
+
 

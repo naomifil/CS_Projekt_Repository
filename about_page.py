@@ -234,3 +234,8 @@ with st.expander(":orange[**⚠ User Warning ⚠**]"):
    - Bei Symptomen sollten Nutzer immer einen Arzt konsultieren.
    """)
 
+st.divider()
+
+st.header("Quellen")
+with st.expander("Einflussfaktoren auf den Risk-Score"):
+    st.write("PM2.5: bla")

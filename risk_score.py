@@ -186,7 +186,8 @@ def calculate_humidity_points(humidity):
         else:
             return 100
 
-humidity_score = 10
+humidity_value = 10
+humidity_score = calculate_humidity_points(humidity_value)
 
 #Environment score
 environment_score = (
@@ -245,9 +246,9 @@ def get_risk_level(score):
     elif score <= 2500:
         return "Mässig (Gelb)", "Leichte Gefahr. Erste Reizungen bei empfindlichen Personen möglich. Moderate Aktivität im Freien ist okay."
     elif score <= 10000:
-        return "Erhöht (Orange)", "Große Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten."
+        return "Erhöht (Orange)", "Grosse Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten."
     elif score <= 40000:
-        return "Hoch (Rot)", "Sehr große Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen"
+        return "Hoch (Rot)", "Sehr grosse Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen"
     else:
         return "Extrem (Violett)", "Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe."
 
@@ -257,6 +258,7 @@ level, message= get_risk_level(risk_score)
 print(risk_score)
 print(level)
 print(message)
+
 
 
 

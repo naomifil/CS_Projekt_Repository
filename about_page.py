@@ -9,6 +9,30 @@ Die App kombiniert Daten zur Luftqualität, Wetterdaten und persönliche
 Gesundheitsinformationen, um einen individuellen Risk-Score zu berechnen.
 """)
 
+with st.expander("**Das Problem**"):
+
+    st.write("Menschen mit Asthma haben oft Schwierigkeiten damit:")
+
+    st.write("""
+    - Luftqualitätsdaten zu verstehen
+    - Zu wissen, wann es sicher ist, nach draussen zu gehen
+    - ihr persönliches Risiko zu bewerten (jeder reagiert unterschiedlich)
+    - Wetter, Luftverschmutzung und Gesundheit miteinander zu verbinden
+    """)
+
+with st.expander("**Die Lösung**"):
+
+    st.write("Das Ziel unseres Projekts ist es, Menschen mit Asthma dabei zu helfen, bessere und sicherere Entscheidungen im Alltag zu treffen.")
+
+    st.write("Unsere App:")
+
+    st.write("""
+    - sammelt Echtzeitdaten zur Luftqualität und zum Wetter
+    - kombiniert diese mit dem Gesundheitsprofil des Nutzers
+    - berechnet daraus einen personalisierten Asthma Risk-Score
+    - stellt das Ergebnis klar und verständlich dar
+    """)
+
 st.divider()
 
 st.header("Einflussfaktoren auf den Risk-Score")
@@ -175,12 +199,38 @@ with st.expander("**Persönliche Faktoren**"):
     - Schwer persistent (Faktor von 4)
     """)
 
-with st.expander("**Endergebnis**"):
-        st.write("Alle Punkte werden mit ihren Gewichten multipliziert und zu einer Gesamtrisikobewertung zusammengerechnet.")
-
-st.subheader("Risk Thresholds")
-
-st.write("MAKE COLOR FOR RISK SCORE")
+with st.expander("**Endergebnis und Risikoschwellwerte**"):
+    st.write(
+        "Alle Punkte werden mit ihren Gewichten multipliziert und zu einer Gesamtrisikobewertung zusammengerechnet.")
 
 
+    st.subheader("Sicher", divider="green")
+    st.write(":green-background[**0-500 Punkte**]")
+    st.write(":green-background[Keine Gefahr. Optimale Bedingungen. Ideal für Sport und Aktivitäten im Freien für alle Gruppen]")
+
+    st.subheader("Mässig", divider="yellow")
+    st.write(":yellow-background[**501-2500 Punkte**]")
+    st.write(":yellow-background[Leichte Gefahr. Erste Reizungen bei empfindlichen Personen möglich. Moderate Aktivität im Freien ist okay.]")
+
+    st.subheader("Erhöht", divider="orange")
+    st.write(":orange-background[**2501-10000 Punkte**]")
+    st.write(":orange-background[Grosse Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten.]")
+
+    st.subheader("Hoch", divider="red")
+    st.write(":red-background[**10001-40000 Punkte**]")
+    st.write(":red-background[Sehr grosse Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen.]")
+
+    st.subheader("Extrem", divider="violet")
+    st.write(":violet-background[**mehr als 40000 Punkte**]")
+    st.write(":violet-background[Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe.]")
+
+
+with st.expander(":orange[**⚠ User Warning ⚠**]"):
+    st.write("Diese App ist kein medizinisches Hilfsmittel.")
+    st.write("""
+   - Wir sind keine Ärzte.
+   - Der Risikowert ist eine Schätzung auf der Grundlage der verfügbaren Daten.
+   - Die App ersetzt keine professionelle medizinische Beratung.
+   - Bei Symptomen sollten Nutzer immer einen Arzt konsultieren.
+   """)
 

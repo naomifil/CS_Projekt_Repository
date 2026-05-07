@@ -13,7 +13,7 @@ All design decisions, testing and integration were performed by the author.
 import pandas as pd
 import sqlite3
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error
 
 DB_PATH = "air_quality2.db"
@@ -81,7 +81,11 @@ def train_model(X, y):
         X, y, test_size=0.3, random_state=42
     )
 
-    model = LinearRegression()
+    model = DecisionTreeRegressor(
+        max_depth=5,
+        random_state=42
+    )
+
     model.fit(X_train, y_train)
 
     return model, X_test, y_test

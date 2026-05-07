@@ -130,8 +130,41 @@ elif seite == "Ergebnisse":
         st.write("Reisebeginn:", st.session_state["reise_start"])
         st.write("Reiseende:", st.session_state["reise_ende"])
 
+
+        st.divider()
+        st.subheader("Aktuelle Luftqualitätsdaten")
+
+        ort_name = st.session_state["ort"]
+        lon, lat = ORTE[ort_name]
+
+##überarbeitet von ChatGPT:
+        if st.button("Luftqualitätsdaten laden"):
+            try:
+                daten = fetch_air_quality(
+                    coordinates=[(lon, lat)],
+                    radius=20000,
+                    limit=5,
+                    parameters=PARAMETER)
+
+                luftdaten = daten[0]
+
+                st.write("Daten für:", ort_name)
+                st.write("Verwendete Messstationen:", luftdaten.station_count)
+
+                for schadstoff, messung in luftdaten.readings.items():
+                    st.write(schadstoff, ":", round(messung.value, 2), messung.units)
+
+            except Exception as fehler:
+                st.error("Die Luftqualitätsdaten konnten nicht geladen werden.")
+                st.write("Fehlermeldung:", fehler)
+        else:
+            st.info("KLicke auf den Button um die aktuellen Luftqualitätsdaten für den gewählten Ort zu laden.")
+
     else:
         st.warning("Bitte gehe zuerst auf die Seite Eingaben und speichere deine Angaben.")
+
+
+
 
 
 

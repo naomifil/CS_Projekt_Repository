@@ -238,4 +238,15 @@ st.divider()
 
 st.header("Quellen")
 with st.expander("Einflussfaktoren auf den Risk-Score"):
-    st.write("PM2.5: bla")
+    st.write("*Air Pollution and Asthma | AAFA.org.* (2025, September 4). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/")
+    st.write("American Lung Association. (n.d.). *Why is my asthma worse in the winter?* https://www.lung.org/blog/cold-weather-asthma")
+    st.write("*Asthma in older adults | AAFA.org.* (2024, October 11). Asthma and Allergy Foundation of America. https://aafa.org/asthma/living-with-asthma/asthma-in-older-adults/")
+    st.write("*Childhood asthma - Symptoms & causes - Mayo Clinic.* (2025, September 20). Mayo Clinic. https://www.mayoclinic.org/diseases-conditions/childhood-asthma/symptoms-causes/syc-20351507")
+    st.write("*How Severe is My Asthma: Classifying Asthma Severity.* (2021, May 20). Allergy & Asthma Network. https://allergyasthmanetwork.org/news/how-severe-is-my-asthma/#intermittent")
+    st.write("Koehle, M. S. (2024). Physiological impacts of atmospheric pollution: Effects of environmental air pollution on exercise. *Physiological Reports, 12*(7), e16005. https://doi.org/10.14814/phy2.16005")
+    st.write("MSD Manual. (2026, May 7). *Table:Klassifikation der Asthma-Schweregrads*-MSD Manual Profi-Ausgabe. MSD Manual Profi-Ausgabe.* https://www.msdmanuals.com/de/profi/multimedia/table/klassifikation-der-asthma-schweregrads")
+    st.write("*Particulate Matter (PM) Basics | US EPA.* (2025, May 30). US EPA. https://www.epa.gov/pm-pollution/particulate-matter-pm-basics")
+    st.write("*Summer asthma and warm weather.* (n.d.). Allergy & Asthma Network. https://allergyasthmanetwork.org/news/summer-asthma-and-warm-weather")
+    st.write("*Weather triggers asthma | AAFA.org.* (2024, August 20). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/weather-triggers-asthma/")
+    st.write("*What is exercise induced asthma? | AAFA.org.* (2024, August 5). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/")
+

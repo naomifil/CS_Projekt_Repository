@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
-DB_PATH = "air_quality.db"
+DB_PATH = "air_quality2.db"
 
 # Load database
 def load_data(db_path=DB_PATH):

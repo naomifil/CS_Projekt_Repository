@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "air_quality.db"
+DB_NAME = "air_quality2.db"
 
 def create_connection():
     return sqlite3.connect(DB_NAME)

@@ -1,5 +1,10 @@
 import streamlit as st
 from api_call import fetch_air_quality
+from datetime import date, timedelta
+import pandas as pd
+from weather_api import fetch_weather
+
+
 
 
 
@@ -16,6 +21,7 @@ ORTE = {
 PARAMETER = ["pm25", "pm10", "o3"]
 ##Ende ChatGPT
 
+MAX_FORECAST_TAGE = 16
 
 st.set_page_config(
     page_title="Luftqualitäts-App",
@@ -32,7 +38,13 @@ seite = st.sidebar.selectbox("Wähle eine Seite aus:",
 if seite == "Startseite":
     st.title("Luftqualitäts-App für Reisen")
     st.header("Startseite")
-    st.write("Willkommen in der Luftqualitäts-App. Diese App hilft dabei, das Risiko durch Luftverschmutzung während einer Reise einzuschätzen.")
+    st.markdown(
+        "Diese App hilft dir dabei, **vor einer Reise** nochmals zu überprüfen, "
+        "wie hoch das mögliche Risiko durch Luftverschmutzung am **Reiseziel** sein könnte. "
+        "So kannst du deine Reiseplanung besser einschätzen und entscheiden, "
+        "ob du deine Aktivitäten anpassen solltest.")
+
+
 
     st.subheader("So benutzt du die App")
     ## folgender Text für seite (nicht der code) von ChatGPT erstellt
@@ -89,14 +101,19 @@ elif seite == "Eingaben":
         st.subheader("Reiseangaben")
         st.caption("Diese Angaben beschreiben, wohin und wann du reisen möchtest.")
 
+        heute = date.today()
+        max_datum = heute + timedelta(days=MAX_FORECAST_TAGE)
+
         ort = st.selectbox(
             "Wähle deinen Reiseort:", list(ORTE.keys()))
 
-        reise_start = st.date_input("Wann beginnt deine Reise?")
+        reise_start = st.date_input("Wann beginnt deine Reise?", min_value=heute, max_value=max_datum)
 
         reise_ende = st.date_input(
             "Wann endet deine Reise?",
-            min_value=reise_start)
+            min_value=reise_start, max_value=max_datum)
+
+        st.caption("Hinweis: Die App erlaubt aktuell nur Reisedaten innerhalb der nächsten 16 Tage, weil die Wettervorhersage nur für einen begrenzten Zeitraum verfügbar ist.")
 ## ende ChatGPT Bearbeitung
 
     if st.button("Eingaben speichern"):
@@ -123,45 +140,90 @@ elif seite == "Ergebnisse":
 
         st.subheader("Gespeicherte Eingaben")
 
-        st.write("Alter:", st.session_state["alter"])
-        st.write("Asthma-Level:", st.session_state["asthma_level"])
-        st.write("Aktivitätslevel:", st.session_state["aktivitaet"])
-        st.write("Ort:", st.session_state["ort"])
-        st.write("Reisebeginn:", st.session_state["reise_start"])
-        st.write("Reiseende:", st.session_state["reise_ende"])
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("Alter:", st.session_state["alter"])
+            st.write("Asthma-Level:", st.session_state["asthma_level"])
+            st.write("Aktivitätslevel:", st.session_state["aktivitaet"])
+        with col2:
+            st.write("Ort:", st.session_state["ort"])
+            st.write("Reisebeginn:", st.session_state["reise_start"])
+            st.write("Reiseende:", st.session_state["reise_ende"])
 
 
         st.divider()
-        st.subheader("Aktuelle Luftqualitätsdaten")
+        st.subheader("Wettervorhersage für dein Reise")
 
         ort_name = st.session_state["ort"]
         lon, lat = ORTE[ort_name]
 
-##überarbeitet von ChatGPT:
-        if st.button("Luftqualitätsdaten laden"):
+##teilweise überarbeitet von ChatGPT:
+        if st.button("Wetterdaten laden"):
             try:
-                daten = fetch_air_quality(
-                    coordinates=[(lon, lat)],
-                    radius=20000,
-                    limit=5,
-                    parameters=PARAMETER)
+                wetter = fetch_weather(
+                    lat=lat,
+                    lon=lon,
+                    past_days=0,
+                    forecast_days=MAX_FORECAST_TAGE
+                )
 
-                luftdaten = daten[0]
+                wetter_tabelle = wetter["daily"]
 
-                st.write("Daten für:", ort_name)
-                st.write("Verwendete Messstationen:", luftdaten.station_count)
+                wetter_tabelle["datum"] = pd.to_datetime(wetter_tabelle["date"]).dt.date
 
-                for schadstoff, messung in luftdaten.readings.items():
-                    st.write(schadstoff, ":", round(messung.value, 2), messung.units)
+                reise_start = st.session_state["reise_start"]
+                reise_ende = st.session_state["reise_ende"]
+
+                wetter_reise = wetter_tabelle[
+                    (wetter_tabelle["datum"] >= reise_start) &
+                    (wetter_tabelle["datum"] <= reise_ende)
+                    ]
+
+                st.write("Wetterdaten für:", ort_name)
+
+                durchschnitt_temp = wetter_reise["temperature_mean"].mean()
+                durchschnitt_feuchtigkeit = wetter_reise["relative_humidity_mean"].mean()
+                anzahl_tage = len(wetter_reise)
+
+                col1, col2, col3 = st.columns(3)
+
+                col1.metric("Reisetage", anzahl_tage)
+##.1f heisst eine Nachkommastelle
+                col2.metric("Ø Temperatur", f"{durchschnitt_temp:.1f} °C")
+
+                col3.metric("Ø Luftfeuchtigkeit", f"{durchschnitt_feuchtigkeit:.1f} %")
+
+                st.caption(
+                    "Diese Wetterdaten werden später als Grundlage für die Vorhersage der Luftverschmutzung verwendet.")
+
+                st.subheader("Temperatur während der Reise")
+
+                temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
+                temperatur_graph = temperatur_graph.set_index("datum")
+
+                st.line_chart(temperatur_graph)
+
+                st.subheader("Relative Luftfeuchtigkeit während der Reise")
+
+                feuchtigkeit_graph = wetter_reise[["datum", "relative_humidity_mean"]].copy()
+                feuchtigkeit_graph = feuchtigkeit_graph.set_index("datum")
+
+                st.line_chart(feuchtigkeit_graph)
+
+                with st.expander("Wetterdaten als Tabelle anzeigen"):
+                    st.dataframe(
+                        wetter_reise[["datum", "temperature_mean", "relative_humidity_mean"]],
+                        use_container_width=True,
+                        hide_index=True
+                    )
 
             except Exception as fehler:
-                st.error("Die Luftqualitätsdaten konnten nicht geladen werden.")
+                st.error("Die Wetterdaten konnten nicht geladen werden.")
                 st.write("Fehlermeldung:", fehler)
         else:
-            st.info("KLicke auf den Button um die aktuellen Luftqualitätsdaten für den gewählten Ort zu laden.")
+            st.info("Klicke auf den Button, um die Wettervorhersage für deinen Reisezeitraum zu laden.")
 
-    else:
-        st.warning("Bitte gehe zuerst auf die Seite Eingaben und speichere deine Angaben.")
+##Ende ChatGPT Überarbeitung
 
 
 

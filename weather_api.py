@@ -22,7 +22,7 @@ openmeteo = create_openmeteo_client()
 # -----------------------------
 # Core fetch function (single location)
 # -----------------------------
-def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_days=3):
+def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_days=14):
     url = "https://api.open-meteo.com/v1/forecast"
 
     params = {

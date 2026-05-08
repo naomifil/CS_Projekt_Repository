@@ -212,7 +212,7 @@ def get_activity_factor(activity):
     elif activity == "light_outdoor":
         return 1.5
     elif activity == "intense_outdoor":
-        return 5
+        return 3
     else:
         return 1
 
@@ -241,13 +241,13 @@ risk_score = environment_score * age_factor * activity_factor * asthma_factor
 
 def get_risk_level(score):
 
-    if score <= 500:
+    if score <= 300:
         return "Sicher (Grün)", "Keine Gefahr. Optimale Bedingungen. Ideal für Sport und Aktivitäten im Freien für alle Gruppen"
-    elif score <= 2500:
+    elif score <= 1500:
         return "Mässig (Gelb)", "Leichte Gefahr. Erste Reizungen bei empfindlichen Personen möglich. Moderate Aktivität im Freien ist okay."
-    elif score <= 10000:
+    elif score <= 6000:
         return "Erhöht (Orange)", "Grosse Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten."
-    elif score <= 40000:
+    elif score <= 24000:
         return "Hoch (Rot)", "Sehr grosse Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen"
     else:
         return "Extrem (Violett)", "Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe."

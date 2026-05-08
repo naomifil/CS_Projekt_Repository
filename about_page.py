@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 st.title("About AirSense")
 
@@ -188,7 +187,7 @@ with st.expander("**Persönliche Faktoren**"):
     st.write("""
     - Innenraum (Faktor von 1)
     - Draussen leichte Aktivität (Faktor von 1.5)
-    - Draussen intensive Aktivität (Faktor von 5) 
+    - Draussen intensive Aktivität (Faktor von 3) 
     """)
 
     st.write("**Asthmaschweregrade**")
@@ -205,23 +204,23 @@ with st.expander("**Endergebnis und Risikoschwellwerte**"):
 
 
     st.subheader("Sicher", divider="green")
-    st.write(":green-background[**0-500 Punkte**]")
+    st.write(":green-background[**0-300 Punkte**]")
     st.write(":green-background[Keine Gefahr. Optimale Bedingungen. Ideal für Sport und Aktivitäten im Freien für alle Gruppen]")
 
     st.subheader("Mässig", divider="yellow")
-    st.write(":yellow-background[**501-2500 Punkte**]")
+    st.write(":yellow-background[**301-1500 Punkte**]")
     st.write(":yellow-background[Leichte Gefahr. Erste Reizungen bei empfindlichen Personen möglich. Moderate Aktivität im Freien ist okay.]")
 
     st.subheader("Erhöht", divider="orange")
-    st.write(":orange-background[**2501-10000 Punkte**]")
+    st.write(":orange-background[**1501-6000 Punkte**]")
     st.write(":orange-background[Grosse Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten.]")
 
     st.subheader("Hoch", divider="red")
-    st.write(":red-background[**10001-40000 Punkte**]")
+    st.write(":red-background[**6001-24000 Punkte**]")
     st.write(":red-background[Sehr grosse Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen.]")
 
     st.subheader("Extrem", divider="violet")
-    st.write(":violet-background[**mehr als 40000 Punkte**]")
+    st.write(":violet-background[**mehr als 24000 Punkte**]")
     st.write(":violet-background[Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe.]")
 
 
@@ -236,17 +235,55 @@ with st.expander(":orange[**⚠ User Warning ⚠**]"):
 
 st.divider()
 
-st.header("Quellen")
-with st.expander("Einflussfaktoren auf den Risk-Score"):
-    st.write("*Air Pollution and Asthma | AAFA.org.* (2025, September 4). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/")
-    st.write("American Lung Association. (n.d.). *Why is my asthma worse in the winter?* https://www.lung.org/blog/cold-weather-asthma")
-    st.write("*Asthma in older adults | AAFA.org.* (2024, October 11). Asthma and Allergy Foundation of America. https://aafa.org/asthma/living-with-asthma/asthma-in-older-adults/")
-    st.write("*Childhood asthma - Symptoms & causes - Mayo Clinic.* (2025, September 20). Mayo Clinic. https://www.mayoclinic.org/diseases-conditions/childhood-asthma/symptoms-causes/syc-20351507")
-    st.write("*How Severe is My Asthma: Classifying Asthma Severity.* (2021, May 20). Allergy & Asthma Network. https://allergyasthmanetwork.org/news/how-severe-is-my-asthma/#intermittent")
-    st.write("Koehle, M. S. (2024). Physiological impacts of atmospheric pollution: Effects of environmental air pollution on exercise. *Physiological Reports, 12*(7), e16005. https://doi.org/10.14814/phy2.16005")
-    st.write("MSD Manual. (2026, May 7). *Table:Klassifikation der Asthma-Schweregrads*-MSD Manual Profi-Ausgabe. MSD Manual Profi-Ausgabe.* https://www.msdmanuals.com/de/profi/multimedia/table/klassifikation-der-asthma-schweregrads")
-    st.write("*Particulate Matter (PM) Basics | US EPA.* (2025, May 30). US EPA. https://www.epa.gov/pm-pollution/particulate-matter-pm-basics")
-    st.write("*Summer asthma and warm weather.* (n.d.). Allergy & Asthma Network. https://allergyasthmanetwork.org/news/summer-asthma-and-warm-weather")
-    st.write("*Weather triggers asthma | AAFA.org.* (2024, August 20). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/weather-triggers-asthma/")
-    st.write("*What is exercise induced asthma? | AAFA.org.* (2024, August 5). Asthma and Allergy Foundation of America. https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/")
+st.header("Additional")
+with st.expander("**Quellen**"):
+    st.write("""
+    *Air Pollution and Asthma | AAFA.org.* (2025, September 4). Asthma and Allergy Foundation of America.  
+    https://aafa.org/asthma/asthma-triggers-causes/air-pollution-smog-asthma/
+    
+    American Lung Association. (n.d.). *Why is my asthma worse in the winter?*  
+    https://www.lung.org/blog/cold-weather-asthma
+    
+    *Asthma in older adults | AAFA.org.* (2024, October 11). Asthma and Allergy Foundation of America.  
+    https://aafa.org/asthma/living-with-asthma/asthma-in-older-adults/
+    
+    *Childhood asthma - Symptoms & causes - Mayo Clinic.* (2025, September 20). Mayo Clinic.  
+    https://www.mayoclinic.org/diseases-conditions/childhood-asthma/symptoms-causes/syc-20351507
+    
+    Global Initiative for Asthma. (2025). *Global Strategy for Asthma Management and Prevention* [Report].
+    
+    Han, A., Deng, S., Yu, J., Zhang, Y., Jalaludin, B., & Huang, C. (2022). *Asthma triggered by extreme temperatures: From epidemiological evidence to biological plausibility.* Environmental Research, 216(Pt 2), 114489.  
+    https://doi.org/10.1016/j.envres.2022.114489
+    
+    *How Severe is My Asthma: Classifying Asthma Severity.* (2021, May 20). Allergy & Asthma Network.  
+    https://allergyasthmanetwork.org/news/how-severe-is-my-asthma/#intermittent
+    
+    Huang, J., Yang, X., Fan, F., Hu, Y., Wang, X., Zhu, S., Ren, G., & Wang, G. (2021). *Outdoor air pollution and the risk of asthma exacerbations in single lag0 and lag1 exposure patterns: a systematic review and meta-analysis.* Journal of Asthma, 59(11), 2322–2339.  
+    https://doi.org/10.1080/02770903.2021.2008429
+    
+    Koehle, M. S. (2024). *Physiological impacts of atmospheric pollution: Effects of environmental air pollution on exercise.* Physiological Reports, 12(7), e16005.  
+    https://doi.org/10.14814/phy2.16005
+    
+    MSD Manual. (2026, May 7). *Table: Klassifikation der Asthma-Schweregrads*-MSD Manual Profi-Ausgabe. MSD Manual Profi-Ausgabe.  
+    https://www.msdmanuals.com/de/profi/multimedia/table/klassifikation-der-asthma-schweregrads
+    
+    *Particulate Matter (PM) Basics | US EPA.* (2025, May 30). US EPA.  
+    https://www.epa.gov/pm-pollution/particulate-matter-pm-basics
+    
+    *Summer asthma and warm weather.* (n.d.). Allergy & Asthma Network.  
+    https://allergyasthmanetwork.org/news/summer-asthma-and-warm-weather
+    
+    *Weather triggers asthma | AAFA.org.* (2024, August 20). Asthma and Allergy Foundation of America.  
+    https://aafa.org/asthma/asthma-triggers-causes/weather-triggers-asthma/
+    
+    Weltgesundheitsorganisation, & Organization, W. H. (2021). *WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide.* World Health Organization.
+    
+    *What is exercise induced asthma? | AAFA.org.* (2024, August 5). Asthma and Allergy Foundation of America.  
+    https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/
+    """)
+
+with st.expander("**Hilfsmittel**"):
+    st.write("Deepl Translate")
+
+
 

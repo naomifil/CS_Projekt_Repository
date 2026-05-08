@@ -141,6 +141,11 @@ elif seite == "Eingaben":
 
 
 
+
+
+
+
+
 elif seite == "Ergebnisse":
     st.title("Deine Ergebnisse")
 
@@ -169,11 +174,10 @@ elif seite == "Ergebnisse":
 ##teilweise überarbeitet von ChatGPT:
         if st.button("Wetterdaten laden"):
             try:
-                wetter = fetch_weather(
+                wetter = lade_wetterdaten(
                     lat=lat,
                     lon=lon,
-                    past_days=0,
-                    forecast_days=MAX_FORECAST_TAGE
+                    forecast_tage=MAX_FORECAST_TAGE
                 )
 
                 wetter_tabelle = wetter["daily"]

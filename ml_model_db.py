@@ -7,7 +7,7 @@ The use of AI included:
 - Code structuring and refactoring
 - Debugging support
 
-Singular section generated entirely by ChatGPT indicated accordingly.
+Section generated entirely by ChatGPT indicated accordingly.
 
 All design decisions, testing and integration were performed by the author.
 """
@@ -33,17 +33,10 @@ def load_data(db_path=DB_PATH):
 # Data preparation: transforms raw data into usable daily datasets for ml
 def preprocess_data(air, weather):
 
-    air["timestamp"] = pd.to_datetime(
-        air["timestamp"],
-        utc=True
-    )
-
+    air["timestamp"] = pd.to_datetime(air["timestamp"], utc=True)
     air["date"] = air["timestamp"].dt.date
 
-    weather["date"] = pd.to_datetime(
-        weather["date"],
-        utc=True
-    ).dt.date
+    weather["date"] = pd.to_datetime(weather["date"], utc=True).dt.date
 
     air["location_id"] = air["location_id"].astype(str)
     weather["location_id"] = weather["location_id"].astype(str)
@@ -86,8 +79,21 @@ def prepare_features(data):
 
     return X, y
 
-# Train model: teaches ml model to predict pollution levels from weather data using regression tree
-def train_model(X, y):
+# Train model: teaches ml model to predict pollution levels for specific location from weather data using regression tree
+def train_model_for_city(location_id, db_path=DB_PATH):
+
+    air, weather = load_data(db_path)
+    air_daily, weather = preprocess_data(air, weather)
+
+    data = merge_data(air_daily, weather)
+
+    data = data[data["location_id"] == str(location_id)]
+
+    if data.empty:
+        raise ValueError(f"No data for location_id={location_id}")
+
+    X, y = prepare_features(data)
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
@@ -99,7 +105,12 @@ def train_model(X, y):
 
     model.fit(X_train, y_train)
 
-    return model, X_test, y_test
+    y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+
+    predictions = pd.DataFrame(y_pred, columns=["pm25", "pm10", "o3"])
+
+    return model, mae, predictions
 
 # Evaluate model: measures how accurate pollutant predictions are compared to real historic API values
 def evaluate_model(model, X_test, y_test):
@@ -110,7 +121,7 @@ def evaluate_model(model, X_test, y_test):
 
     return mae, pred_df
 
-# Future prediction: allows model to estimate future air quality using new weather input data
+# Single future prediction: allows model to estimate future air quality using new weather input data for a single day
 def predict_future(model, temperature, humidity):
     future_weather = pd.DataFrame(
         [[temperature, humidity]],
@@ -119,29 +130,46 @@ def predict_future(model, temperature, humidity):
 
     future_pred = model.predict(future_weather)
 
-    return pd.DataFrame(future_pred, columns=["pm25", "pm10", "o3"])
+    return {
+        "pm25": future_pred[0][0],
+        "pm10": future_pred[0][1],
+        "o3": future_pred[0][2]
+    }
+
+# Multi-day future prediction: allows model to estimate future air quality using new weather input data for multiple days
+# --- AI-generated section (ChatGPT/OpenAI) ---
+def predict_multiple_days(model, weather_df):
+
+    X = weather_df[[
+        "temperature_mean",
+        "relative_humidity_mean"
+    ]]
+
+    preds = model.predict(X)
+
+    result = weather_df.copy()
+    result["pm25"] = preds[:, 0]
+    result["pm10"] = preds[:, 1]
+    result["o3"] = preds[:, 2]
+
+    return result
+# --- End AI-generated section ---
 
 # Full pipeline: executes the entire ml process in one step
 def run_pipeline(db_path=DB_PATH):
-    air, weather = load_data(db_path)
-    air_daily, weather = preprocess_data(air, weather)
-    data = merge_data(air_daily, weather)
-    X, y = prepare_features(data)
 
-    model, X_test, y_test = train_model(X, y)
-    mae, predictions = evaluate_model(model, X_test, y_test)
+    model, mae, predictions = train_model_for_city("1", db_path)
 
     return model, mae, predictions
 
 # --- AI-generated section (ChatGPT/OpenAI) ---: acts as the main entry point of the program and demonstrates how the model is used
 if __name__ == "__main__":
-    model, mae, predictions = run_pipeline()
+
+    model, mae, preds = train_model_for_city("1")
 
     print("MAE:", mae)
-    print("\nPredictions sample:")
-    print(predictions.head())
+    print(preds.head())
 
     future = predict_future(model, 25, 70)
-    print("\nFuture prediction:")
-    print(future)
+    print("\nFuture prediction:", future)
 # --- End AI-generated section ---

@@ -1,5 +1,5 @@
 .env
 .idea/
 
-# dont add the db to git.
-*.db
+#exclude old db for compatibility
+air_quality.db

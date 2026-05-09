@@ -34,6 +34,21 @@ PARAMETER = ["pm25", "pm10", "o3"]
 
 MAX_FORECAST_TAGE = 14
 
+MAX_RISIKO_SCORE = 105000
+
+##Funktion mit einzelnen farben von ChatGPT gemacht
+def hole_risiko_design(farbe):
+    if farbe == "Grün":
+        return "🟢", "#e8f5e9", "#2e7d32"
+    elif farbe == "Gelb":
+        return "🟡", "#fffde7", "#f9a825"
+    elif farbe == "Orange":
+        return "🟠", "#fff3e0", "#ef6c00"
+    elif farbe == "Rot":
+        return "🔴", "#ffebee", "#c62828"
+    else:
+        return "🟣", "#f3e5f5", "#6a1b9a"
+
 ##damit das ML nicht bei jedem rerun neu trainiert wird, merkt sich streamlit das trainierte modell durch cache funktion
 @st.cache_resource
 def lade_ml_modell(location_id):
@@ -164,12 +179,14 @@ elif seite == "Eingaben":
 
 
 elif seite == "Ergebnisse":
-    st.title("Deine Ergebnisse")
+    st.write("Hier kannst du dir deine Ergebnisse anschauen.")
+    st.title("Deine persönliche Risikoeinschätzung")
 
     if "alter" in st.session_state:
-        st.write("Hier siehst du die Angaben, die du auf der Eingabeseite gespeichert hast.")
+
 
         st.subheader("Gespeicherte Eingaben")
+        st.write("Stimmen diese Daten? Du kannst auf 'Eingaben' zurückgehen, um etwas zu ändern.")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -183,7 +200,7 @@ elif seite == "Ergebnisse":
 
 
         st.divider()
-        st.subheader("Wettervorhersage für dein Reise")
+        st.subheader("Wettervorhersage für deineer Reise")
 
         ort_name = st.session_state["ort"]
         lon, lat = ORTE[ort_name]
@@ -248,7 +265,7 @@ elif seite == "Ergebnisse":
                     )
 
             except Exception as fehler:
-                st.error("Die Wetterdaten konnten nicht geladen werden.")
+                st.error("❌ Die Wetterdaten konnten nicht geladen werden.")
                 st.write("Fehlermeldung:", fehler)
 
             st.divider()
@@ -309,20 +326,44 @@ elif seite == "Ergebnisse":
 
                 schlimmster_tag = vorhersage.loc[vorhersage["risiko_score"].idxmax()]
 
+##Abschnitt komplett von ChatGPT umgeschrieben und generiert
+                emoji, hintergrund_farbe, text_farbe = hole_risiko_design(schlimmster_tag["farbe"])
+
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color: {hintergrund_farbe};
+                        padding: 24px;
+                        border-radius: 18px;
+                        border-left: 8px solid {text_farbe};
+                        margin-bottom: 20px;
+                    ">
+                        <h2 style="color: {text_farbe}; margin-bottom: 8px;">
+                            {emoji} {schlimmster_tag["risiko_level"]}es Risiko
+                        </h2>
+                        <p style="font-size: 18px; margin-bottom: 10px;">
+                            Der kritischste Tag deiner Reise ist der 
+                            <b>{schlimmster_tag["datum"].strftime("%d.%m.%Y")}</b>.
+                        </p>
+                        <p style="font-size: 16px;">
+                            {schlimmster_tag["empfehlung"]}
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
                 col1, col2, col3 = st.columns(3)
 
-                col1.metric("Höchster Risiko-Score", round(schlimmster_tag["risiko_score"], 2))
-                col2.metric("Kritischster Tag", schlimmster_tag["datum"].strftime("%d.%m.%Y"))
-                col3.metric("Risikostufe", schlimmster_tag["risiko_level"])
+                with col1:
+                    st.metric("Höchster Risiko-Score", round(schlimmster_tag["risiko_score"], 2))
+                    st.caption("Der maximal mögliche Risiko-Score ist 105'000")
 
-                if schlimmster_tag["farbe"] == "Grün":
-                    st.success(schlimmster_tag["empfehlung"])
-                elif schlimmster_tag["farbe"] == "Gelb":
-                    st.warning(schlimmster_tag["empfehlung"])
-                elif schlimmster_tag["farbe"] == "Orange":
-                    st.warning(schlimmster_tag["empfehlung"])
-                else:
-                    st.error(schlimmster_tag["empfehlung"])
+                with col2:
+                    st.metric("Kritischster Tag", schlimmster_tag["datum"].strftime("%d.%m.%Y"))
+
+                with col3:
+                    st.metric("Risikostufe", schlimmster_tag["risiko_level"])
 
                 st.subheader("Risikoverlauf während der Reise")
 
@@ -330,6 +371,28 @@ elif seite == "Ergebnisse":
                 risiko_graph = risiko_graph.set_index("datum")
 
                 st.line_chart(risiko_graph)
+
+                st.subheader("Übersicht pro Reisetag")
+
+                for index, tag in vorhersage.iterrows():
+                    emoji, hintergrund_farbe, text_farbe = hole_risiko_design(tag["farbe"])
+
+                    with st.container(border=True):
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            st.markdown(f"### {emoji}")
+
+                        with col2:
+                            st.markdown(f"**{tag['datum'].strftime('%d.%m.%Y')}**")
+                            st.write(f"Risiko: **{tag['risiko_level']} ** ")
+
+                        with col3:
+                            st.write(tag["empfehlung"])
+                            st.caption(
+                                f"PM2.5: {tag['pm25']:.1f} | "
+                                f"PM10: {tag['pm10']:.1f} | "
+                                f"O₃: {tag['o3']:.1f}")
 
                 with st.expander("Tägliche Risikodaten anzeigen"):
                     st.dataframe(vorhersage[["datum", "temperature_mean", "relative_humidity_mean", "pm25", "pm10", "o3", "risiko_score", "risiko_level", "farbe"]], use_container_width=True, hide_index=True)
@@ -339,7 +402,7 @@ elif seite == "Ergebnisse":
 
 
             except Exception as fehler:
-                st.error("Die Luftverschmutzung konnte mit dem ML-Modell nicht vorhergesagt werden.")
+                st.error("❌ Die Luftverschmutzung konnte mit dem ML-Modell nicht vorhergesagt werden.")
                 st.write("Fehlermeldung:", fehler)
 
 
@@ -377,6 +440,31 @@ else:
     Die App kombiniert Daten zur Luftqualität, Wetterdaten und persönliche 
     Gesundheitsinformationen, um einen individuellen Risk-Score zu berechnen.
     """)
+
+    with st.expander("**Das Problem**"):
+
+        st.write("Menschen mit Asthma haben oft Schwierigkeiten damit:")
+
+        st.write("""
+        - Luftqualitätsdaten zu verstehen
+        - Zu wissen, wann es sicher ist, nach draussen zu gehen
+        - Ihr persönliches Risiko zu bewerten (jeder reagiert unterschiedlich)
+        - Wetter, Luftverschmutzung und Gesundheit miteinander zu verbinden
+        """)
+
+    with st.expander("**Die Lösung**"):
+
+        st.write(
+            "Das Ziel unseres Projekts ist es, Menschen mit Asthma dabei zu helfen, bessere und sicherere Entscheidungen im Alltag zu treffen.")
+
+        st.write("Unsere App:")
+
+        st.write("""
+        - sammelt Echtzeitdaten zur Luftqualität und zum Wetter
+        - kombiniert diese mit dem Gesundheitsprofil des Nutzers
+        - berechnet daraus einen personalisierten Asthma Risk-Score
+        - stellt das Ergebnis klar und verständlich dar
+        """)
 
     st.divider()
 
@@ -451,7 +539,7 @@ else:
     with st.expander("**Alter**"):
         st.write("""
         Das Alter beeinflusst, wie empfindlich eine Person auf Luftverschmutzung und Wetterbedingungen reagiert.
-        Wenn Kinder (unter 18 Jahren) Triggern ausgesetzt sind, entzünden sich ihre Lungen und Atemwege leichter. 
+        Wenn Kinder (unter 14 Jahren) Triggern ausgesetzt sind, entzünden sich ihre Lungen und Atemwege leichter. 
         Ältere Erwachsene (ab 65 Jahren) reagieren empfindlicher auf Asthmaauslöser, da die Lungenfunktion mit zunehmendem Alter abnimmt 
         und die Symptome schlimmer sind oder schwieriger zu behandeln sein können.
         """)
@@ -492,3 +580,146 @@ else:
                - Starke Einschränkung der alltäglichen Aktivitäten
                """)
 
+    st.divider()
+
+    st.header("Berechnung des Risk-Scores")
+    with st.expander("**Umweltfaktoren**"):
+
+        st.write("""
+        - PM2.5
+        - PM10 
+        - O3
+        - Temperatur
+        - Luftfeuchtigkeit
+        """)
+
+        st.write(
+            "Jeder Faktor wird in einen Punktwert zwischen 0 und 100 umgerechnet, je nachdem, wie schädlich der gemessene Wert ist.")
+
+        st.write("**Gewichtung**")
+        st.write("Nicht alle Faktoren sind gleich wichtig:")
+        st.write("""
+        - PM2,5 → stärkster Einfluss (Faktor von 10)
+        - Ozon → hoher Einfluss (Faktor von 8)
+        - PM10 → mittlerer Einfluss (Faktor von 5)
+        - Temperatur → geringerer Einfluss (Faktor von 3)
+        - Luftfeuchtigkeit → geringster Einfluss (Faktor von 1)
+        """)
+
+        # WHERE IS THE INFO THAT SAYS WHY SOME ARE WORSE
+
+    with st.expander("**Persönliche Faktoren**"):
+
+        st.write("Der Wert wird anhand folgender Faktoren angepasst:")
+
+        st.write("**Alter**")
+        st.write("""
+        - Kind → 0-14 (Faktor von 3)
+        - Erwachsener → 15-65 (Faktor von 1)
+        - Senioren → > 65 (Faktor von 1.8)
+        """)
+
+        st.write("**Aktivität**")
+        st.write("""
+        - Innenraum (Faktor von 1)
+        - Draussen leichte Aktivität (Faktor von 1.5)
+        - Draussen intensive Aktivität (Faktor von 3) 
+        """)
+
+        st.write("**Asthmaschweregrade**")
+        st.write("""
+        - Intermittierend (Faktor von 1)
+        - Mild persistent (Faktor von 1.5)
+        - Moderat persistent (Faktor von 2.5)
+        - Schwer persistent (Faktor von 4)
+        """)
+
+    with st.expander("**Endergebnis und Risikoschwellwerte**"):
+        st.write(
+            "Alle Punkte werden mit ihren Gewichten multipliziert und zu einer Gesamtrisikobewertung zusammengerechnet.")
+
+        st.subheader("Sicher", divider="green")
+        st.write(":green-background[**0-300 Punkte**]")
+        st.write(
+            ":green-background[Keine Gefahr. Optimale Bedingungen. Ideal für Sport und Aktivitäten im Freien für alle Gruppen]")
+
+        st.subheader("Mässig", divider="yellow")
+        st.write(":yellow-background[**301-1500 Punkte**]")
+        st.write(
+            ":yellow-background[Leichte Gefahr. Erste Reizungen bei empfindlichen Personen möglich. Moderate Aktivität im Freien ist okay.]")
+
+        st.subheader("Erhöht", divider="orange")
+        st.write(":orange-background[**1501-6000 Punkte**]")
+        st.write(
+            ":orange-background[Grosse Gefahr. Risikogruppen (Kinder/schweres Asthma) sollten intensive Anstrengung im Freien vermeiden. Medikation bereithalten.]")
+
+        st.subheader("Hoch", divider="red")
+        st.write(":red-background[**6001-24000 Punkte**]")
+        st.write(
+            ":red-background[Sehr grosse Gefahr. Symptome sind sehr wahrscheinlich. Aktivitäten im Freien für alle Asthmatiker stark einschränken. Innenräume bevorzugen.]")
+
+        st.subheader("Extrem", divider="violet")
+        st.write(":violet-background[**mehr als 24000 Punkte**]")
+        st.write(
+            ":violet-background[Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe.]")
+
+    with st.expander(":orange[**⚠ User Warning ⚠**]"):
+        st.write("Diese App ist kein medizinisches Hilfsmittel.")
+        st.write("""
+       - Wir sind keine Ärzte.
+       - Der Risikowert ist eine Schätzung auf der Grundlage der verfügbaren Daten.
+       - Die App ersetzt keine professionelle medizinische Beratung.
+       - Bei Symptomen sollten Nutzer immer einen Arzt konsultieren.
+       """)
+
+    st.divider()
+
+    st.header("Additional")
+    with st.expander("**Quellen**"):
+        st.write("""
+        *Air Pollution and Asthma | AAFA.org.* (2025, September 4). Asthma and Allergy Foundation of America.  
+        https://aafa.org/asthma/asthma-triggers-causes/air-pollution-smog-asthma/
+
+        American Lung Association. (n.d.). *Why is my asthma worse in the winter?*  
+        https://www.lung.org/blog/cold-weather-asthma
+
+        *Asthma in older adults | AAFA.org.* (2024, October 11). Asthma and Allergy Foundation of America.  
+        https://aafa.org/asthma/living-with-asthma/asthma-in-older-adults/
+
+        *Childhood asthma - Symptoms & causes - Mayo Clinic.* (2025, September 20). Mayo Clinic.  
+        https://www.mayoclinic.org/diseases-conditions/childhood-asthma/symptoms-causes/syc-20351507
+
+        Global Initiative for Asthma. (2025). *Global Strategy for Asthma Management and Prevention* [Report].
+
+        Han, A., Deng, S., Yu, J., Zhang, Y., Jalaludin, B., & Huang, C. (2022). *Asthma triggered by extreme temperatures: From epidemiological evidence to biological plausibility.* Environmental Research, 216(Pt 2), 114489.  
+        https://doi.org/10.1016/j.envres.2022.114489
+
+        *How Severe is My Asthma: Classifying Asthma Severity.* (2021, May 20). Allergy & Asthma Network.  
+        https://allergyasthmanetwork.org/news/how-severe-is-my-asthma/#intermittent
+
+        Huang, J., Yang, X., Fan, F., Hu, Y., Wang, X., Zhu, S., Ren, G., & Wang, G. (2021). *Outdoor air pollution and the risk of asthma exacerbations in single lag0 and lag1 exposure patterns: a systematic review and meta-analysis.* Journal of Asthma, 59(11), 2322–2339.  
+        https://doi.org/10.1080/02770903.2021.2008429
+
+        Koehle, M. S. (2024). *Physiological impacts of atmospheric pollution: Effects of environmental air pollution on exercise.* Physiological Reports, 12(7), e16005.  
+        https://doi.org/10.14814/phy2.16005
+
+        MSD Manual. (2026, May 7). *Table: Klassifikation der Asthma-Schweregrads*-MSD Manual Profi-Ausgabe. MSD Manual Profi-Ausgabe.  
+        https://www.msdmanuals.com/de/profi/multimedia/table/klassifikation-der-asthma-schweregrads
+
+        *Particulate Matter (PM) Basics | US EPA.* (2025, May 30). US EPA.  
+        https://www.epa.gov/pm-pollution/particulate-matter-pm-basics
+
+        *Summer asthma and warm weather.* (n.d.). Allergy & Asthma Network.  
+        https://allergyasthmanetwork.org/news/summer-asthma-and-warm-weather
+
+        *Weather triggers asthma | AAFA.org.* (2024, August 20). Asthma and Allergy Foundation of America.  
+        https://aafa.org/asthma/asthma-triggers-causes/weather-triggers-asthma/
+
+        Weltgesundheitsorganisation, & Organization, W. H. (2021). *WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide.* World Health Organization.
+
+        *What is exercise induced asthma? | AAFA.org.* (2024, August 5). Asthma and Allergy Foundation of America.  
+        https://aafa.org/asthma/asthma-triggers-causes/exercise-induced-asthma/
+        """)
+
+    with st.expander("**Hilfsmittel**"):
+        st.write("Deepl Translate")

@@ -3,6 +3,8 @@ from api_call import fetch_air_quality
 from datetime import date, timedelta
 import pandas as pd
 from weather_api import fetch_weather
+from ml_model_db import train_model_for_city, predict_multiple_days
+from risk_module import calculate_total_risk
 
 
 
@@ -17,11 +19,26 @@ ORTE = {
     "Frankfurt": (8.6821, 50.1109),
     "Brüssel": (4.3517, 50.8503),
     "Stockholm": (18.0686, 59.3293)}
+## für das ML modell
+ORT_IDS = {
+    "Paris": "1",
+    "Zürich": "2",
+    "Berlin": "3",
+    "London": "4",
+    "Frankfurt": "5",
+    "Brüssel": "6",
+    "Stockholm": "7"}
 
 PARAMETER = ["pm25", "pm10", "o3"]
 ##Ende ChatGPT
 
 MAX_FORECAST_TAGE = 14
+
+##damit das ML nicht bei jedem rerun neu trainiert wird, merkt sich streamlit das trainierte modell durch cache funktion
+@st.cache_resource
+def lade_ml_modell(location_id):
+    model, mae, predictions = train_model_for_city(location_id)
+    return model, mae
 
 @st.cache_data(ttl=300)
 def lade_wetterdaten(lat, lon, forecast_tage):
@@ -233,6 +250,100 @@ elif seite == "Ergebnisse":
             except Exception as fehler:
                 st.error("Die Wetterdaten konnten nicht geladen werden.")
                 st.write("Fehlermeldung:", fehler)
+
+            st.divider()
+            st.subheader("Vorhergesagte Luftverschmutzung")
+
+            try:
+                location_id = ORT_IDS[ort_name]
+                model, mae = lade_ml_modell(location_id)
+                vorhersage = predict_multiple_days(model, wetter_reise)
+
+
+                st.write("Das Modell schätzt aus den Wetterdaten die Luftverschmutzung für deine Reisetage.")
+                st.caption(f"Durchschnittlicher Modellfehler im Test: {mae:.2f}")
+
+                st.dataframe(
+                    vorhersage[["datum", "pm25", "pm10", "o3"]],
+                    use_container_width=True,
+                    hide_index=True)
+
+                st.subheader("Entwicklung der vorhergesagten Schadstoffe")
+
+                schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
+                schadstoff_graph = schadstoff_graph.set_index("datum")
+
+                st.line_chart(schadstoff_graph)
+
+                st.divider()
+                st.subheader("Tägliche Risikoeinschätzung")
+
+                risiko_scores = []
+                risiko_levels = []
+                farben = []
+                empfehlungen = []
+
+##abschnitt von ChatGPT erstellt:
+
+                for index, zeile in vorhersage.iterrows():
+                    risiko_score, risiko_level, farbe, empfehlung = calculate_total_risk(
+                        pm25=zeile["pm25"],
+                        pm10=zeile["pm10"],
+                        o3=zeile["o3"],
+                        temperature=zeile["temperature_mean"],
+                        humidity=zeile["relative_humidity_mean"],
+                        alter=st.session_state["alter"],
+                        aktivitaet=st.session_state["aktivitaet"],
+                        asthma_level=st.session_state["asthma_level"]
+                    )
+
+                    risiko_scores.append(risiko_score)
+                    risiko_levels.append(risiko_level)
+                    farben.append(farbe)
+                    empfehlungen.append(empfehlung)
+
+                vorhersage["risiko_score"] = risiko_scores
+                vorhersage["risiko_level"] = risiko_levels
+                vorhersage["farbe"] = farben
+                vorhersage["empfehlung"] = empfehlungen
+
+                schlimmster_tag = vorhersage.loc[vorhersage["risiko_score"].idxmax()]
+
+                col1, col2, col3 = st.columns(3)
+
+                col1.metric("Höchster Risiko-Score", round(schlimmster_tag["risiko_score"], 2))
+                col2.metric("Kritischster Tag", schlimmster_tag["datum"].strftime("%d.%m.%Y"))
+                col3.metric("Risikostufe", schlimmster_tag["risiko_level"])
+
+                if schlimmster_tag["farbe"] == "Grün":
+                    st.success(schlimmster_tag["empfehlung"])
+                elif schlimmster_tag["farbe"] == "Gelb":
+                    st.warning(schlimmster_tag["empfehlung"])
+                elif schlimmster_tag["farbe"] == "Orange":
+                    st.warning(schlimmster_tag["empfehlung"])
+                else:
+                    st.error(schlimmster_tag["empfehlung"])
+
+                st.subheader("Risikoverlauf während der Reise")
+
+                risiko_graph = vorhersage[["datum", "risiko_score"]].copy()
+                risiko_graph = risiko_graph.set_index("datum")
+
+                st.line_chart(risiko_graph)
+
+                with st.expander("Tägliche Risikodaten anzeigen"):
+                    st.dataframe(vorhersage[["datum", "temperature_mean", "relative_humidity_mean", "pm25", "pm10", "o3", "risiko_score", "risiko_level", "farbe"]], use_container_width=True, hide_index=True)
+
+
+
+
+
+            except Exception as fehler:
+                st.error("Die Luftverschmutzung konnte mit dem ML-Modell nicht vorhergesagt werden.")
+                st.write("Fehlermeldung:", fehler)
+
+
+
         else:
             st.info("Klicke auf den Button, um die Wettervorhersage für deinen Reisezeitraum zu laden.")
 

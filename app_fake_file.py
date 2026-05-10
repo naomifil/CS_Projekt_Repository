@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
-from api_call import fetch_air_quality
-from database import create_tables
+from api_and_db import fetch_air_quality, create_tables
 
 
 # --------------------------------------------------

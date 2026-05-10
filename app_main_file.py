@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd      # für Tabellen und Diagramme
 import random            # um zufällige Fake-Daten zu erzeugen
-from api_call import fetch_air_quality
-from database import create_tables
+from api_and_db import fetch_air_quality
+from api_and_db import create_tables
 
 st.write ("Welcome to our App")
 st.write ("This is a tool to help you analyze health risks based on local air quality")

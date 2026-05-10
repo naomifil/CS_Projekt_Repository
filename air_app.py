@@ -1,8 +1,7 @@
 import streamlit as st
-from api_call import fetch_air_quality
 from datetime import date, timedelta
 import pandas as pd
-from weather_api import fetch_weather
+from api_and_db import fetch_weather
 from ml_model_db import train_model_for_city, predict_multiple_days
 from risk_module import calculate_total_risk
 

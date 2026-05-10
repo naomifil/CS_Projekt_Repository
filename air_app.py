@@ -112,6 +112,8 @@ if seite == "Startseite":
 
 
 elif seite == "Eingaben":
+    st.write("Hier kannst du deine Daten eingeben.")
+
     st.title("Deine Reisedaten")
     st.markdown("Damit die App eine persönliche Einschätzung geben kann, brauchen wir einige Angaben zu deiner Reise und zu deinem Gesundheitsprofil.")
     st.write("Die Informationen werden später verwendet, um die Luftqualität am gewählten Ort mit deinem Asthma-Level und deiner geplanten Aktivität zu verbinden.")
@@ -430,7 +432,7 @@ elif seite == "Ergebnisse":
 
 
 else:
-    st.header("Methodik")
+
     st.write("Hier wird erklärt, wie der Risikoscore berechnet wird.")
 ## von Frieda
     st.title("About AirSense")
@@ -556,7 +558,7 @@ else:
         Unsere App unterscheidet zwischen den vier Stufen, die von den meisten Ärzten und Forschern verwendet werden. 
         """)
 
-        st.markdown("*Intermittierendes Asthma*")
+        st.markdown("*Kein bis sehr leicht persistierendes Asthma*")
         st.markdown("""
         - Tagesbeschwerden treten weniger als zweimal pro Woche auf, nächtliche Beschwerden weniger als zweimal pro Monat
         - Kaum bis keine Auswirkungen auf das tägliche Leben 
@@ -568,7 +570,7 @@ else:
             - Leichte Einschränkungen bei den täglichen Aktivitäten sind möglich
             """)
 
-        st.markdown("*Moderat persistierendes*")
+        st.markdown("*Moderat persistierendes Asthma*")
         st.markdown("""
                - Symptome während dem Tag treten täglich auf, Symptome in der Nacht 5-mal oder öfter pro Monat
                - Alltägliche Aktivitäten sind etwas beeinträchtigt 
@@ -602,11 +604,11 @@ else:
         - PM2,5 → stärkster Einfluss (Faktor von 10)
         - Ozon → hoher Einfluss (Faktor von 8)
         - PM10 → mittlerer Einfluss (Faktor von 5)
-        - Temperatur → geringerer Einfluss (Faktor von 3)
+        - Temperatur → geringerer Einfluss (Faktor von 1)
         - Luftfeuchtigkeit → geringster Einfluss (Faktor von 1)
         """)
 
-        # WHERE IS THE INFO THAT SAYS WHY SOME ARE WORSE
+
 
     with st.expander("**Persönliche Faktoren**"):
 
@@ -614,24 +616,27 @@ else:
 
         st.write("**Alter**")
         st.write("""
-        - Kind → 0-14 (Faktor von 3)
-        - Erwachsener → 15-65 (Faktor von 1)
-        - Senioren → > 65 (Faktor von 1.8)
+        - Kleinkinder bis 1 Jahr → Faktor 3.5
+        - Kinder von 2 bis 3 Jahren → Faktor 2.5
+        - Kinder von 4 bis 12 Jahren → Faktor 1.7
+        - Erwachsene von 13 bis 64 Jahren → Faktor 1.0
+        - Ältere Personen von 65 bis 75 Jahren → Faktor 1.7
+        - Personen über 75 Jahre → Faktor 3.5
         """)
 
         st.write("**Aktivität**")
         st.write("""
-        - Innenraum (Faktor von 1)
-        - Draussen leichte Aktivität (Faktor von 1.5)
-        - Draussen intensive Aktivität (Faktor von 3) 
+        - Nicht aktiv → Faktor 1.0
+        - Aktiv → Faktor 1.5
+        - Sehr aktiv → Faktor 3.0
         """)
 
         st.write("**Asthmaschweregrade**")
         st.write("""
-        - Intermittierend (Faktor von 1)
+        - Intermittierend (Faktor von 1.0)
         - Mild persistent (Faktor von 1.5)
         - Moderat persistent (Faktor von 2.5)
-        - Schwer persistent (Faktor von 4)
+        - Schwer persistent (Faktor von 4.0)
         """)
 
     with st.expander("**Endergebnis und Risikoschwellwerte**"):
@@ -674,7 +679,7 @@ else:
 
     st.divider()
 
-    st.header("Additional")
+    st.header("Zusätzliche Informationen")
     with st.expander("**Quellen**"):
         st.write("""
         *Air Pollution and Asthma | AAFA.org.* (2025, September 4). Asthma and Allergy Foundation of America.  

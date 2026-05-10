@@ -1,3 +1,6 @@
+# inserts a location into the database and returns the created row.
+# if the location already exists, the insert is ignored and the existing location is returned.
+# Structured with ChatGPT
 def insert_locations(conn, coordinates):
     cursor = conn.cursor()
     location_ids = {}

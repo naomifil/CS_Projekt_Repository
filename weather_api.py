@@ -6,7 +6,6 @@ from retry_requests import retry
 
 # -----------------------------
 # Setup client (reuse globally)
-# -----------------------------
 def create_openmeteo_client():
     cache_session = requests_cache.CachedSession(
         '.cache',
@@ -21,7 +20,7 @@ openmeteo = create_openmeteo_client()
 
 # -----------------------------
 # Core fetch function (single location)
-# -----------------------------
+# Code adapted from API documentation
 def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_days=14):
     url = "https://api.open-meteo.com/v1/forecast"
 
@@ -40,7 +39,8 @@ def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_day
     responses = openmeteo.weather_api(url, params=params)
     response = responses[0]
 
-    # Daily data
+    # Daily data -> one instance for each day for 28 days in past and 14 days forecast
+    # Code here from API documentation and debugged/rewritten with ChatGPT
     daily = response.Daily()
 
     dates = pd.date_range(
@@ -57,7 +57,7 @@ def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_day
         freq=pd.Timedelta(seconds=daily.Interval()),
         inclusive="left"
     )
-
+    # create df with fetched data
     daily_df = pd.DataFrame({
         "date": dates,
         "temperature_mean": daily.Variables(0).ValuesAsNumpy(),
@@ -76,21 +76,15 @@ def fetch_weather(lat, lon, timezone="Europe/Berlin", past_days=28, forecast_day
 
 # -----------------------------
 # Batch function (multiple locations)
-# -----------------------------
+# Using fetch_weather which was for one location only, tailored to match json file structure with predefined stations
+# from one shot query
 def fetch_weather_batch(locations):
-    """
-    locations: list of dicts like:
-    [
-        {"name": "Zurich", "lat": 47.37, "lon": 8.54},
-        {"name": "Bern", "lat": 46.95, "lon": 7.44}
-    ]
-    """
-
     results = {}
 
     for loc in locations:
         name = loc.get("name", f"{loc['lat']},{loc['lon']}")
 
+        # fetch_weather for each location available in locations
         results[name] = fetch_weather(
             lat=loc["lat"],
             lon=loc["lon"]

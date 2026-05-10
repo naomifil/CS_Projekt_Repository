@@ -1,16 +1,17 @@
 import sqlite3
 
-DB_NAME = "air_quality2.db"
+DB_NAME = "air_quality2.db" # db with downloaded dataset for ml and fetched data api calls
 
+# create connection to db
 def create_connection():
     return sqlite3.connect(DB_NAME)
 
-
+# creates db if not exist, db should be in the submitted zip
 def create_tables():
     conn = create_connection()
     cursor = conn.cursor()
 
-    # Locations (user-defined or query-based areas)
+    # Locations, preloaded in database
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS locations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,7 +22,9 @@ def create_tables():
     )
     """)
 
-    # location level air quality
+    # location level air quality with selected relevant data incl. units
+    # here timestamp was set to current time stamp to avoid many missing values
+    # because most stations only measure every few days (-> Limitation)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS air_quality (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,9 +45,10 @@ def create_tables():
         FOREIGN KEY (location_id) REFERENCES locations(id),
         UNIQUE(location_id, timestamp)
     )
-    """)
+    """)    # station count -> we set a limit of max. 3 stations per location and only included stations
+            # in a radius of 25km that measure all 3 features to avoid missing data
 
-    # weather_daily - historical data and forecast
+    # weather_daily includes historical data and forecast from API
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS weather_daily (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

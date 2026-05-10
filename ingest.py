@@ -2,7 +2,7 @@ import json
 from database import create_tables, create_connection
 from custom_db.locations import insert_locations
 from custom_db.stations import insert_stations
-from ingestion.air_quality import ingest_air_quality
+from ingestion.air_quality import get_fresh_air_quality_measurements
 from ingestion.weather import ingest_weather
 
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # insert_stations(conn, station_map, location_ids)
 
     # fetch data and insert measurements
-    ingest_air_quality(conn, coords, location_ids)
+    get_fresh_air_quality_measurements(conn, coords, location_ids)
     ingest_weather(conn, coords, location_ids)
 
     conn.commit()

@@ -186,29 +186,27 @@ elif seite == "Ergebnisse":
 
     if "alter" in st.session_state:
 
-
         st.subheader("Gespeicherte Eingaben")
         st.write("Stimmen diese Daten? Du kannst auf 'Eingaben' zurückgehen, um etwas zu ändern.")
 
         col1, col2 = st.columns(2)
+
         with col1:
             st.write("Alter:", st.session_state["alter"])
             st.write("Asthma-Level:", st.session_state["asthma_level"])
             st.write("Aktivitätslevel:", st.session_state["aktivitaet"])
+
         with col2:
             st.write("Ort:", st.session_state["ort"])
             st.write("Reisebeginn:", st.session_state["reise_start"])
             st.write("Reiseende:", st.session_state["reise_ende"])
 
-
         st.divider()
-        st.subheader("Wettervorhersage für deineer Reise")
 
         ort_name = st.session_state["ort"]
         lon, lat = ORTE[ort_name]
 
-##teilweise überarbeitet von ChatGPT:
-        if st.button("Wetterdaten laden"):
+        if st.button("Ergebnisse laden"):
             try:
                 wetter = lade_wetterdaten(
                     lat=lat,
@@ -228,81 +226,14 @@ elif seite == "Ergebnisse":
                     (wetter_tabelle["datum"] <= reise_ende)
                     ]
 
-                st.write("Wetterdaten für:", ort_name)
-
-                durchschnitt_temp = wetter_reise["temperature_mean"].mean()
-                durchschnitt_feuchtigkeit = wetter_reise["relative_humidity_mean"].mean()
-                anzahl_tage = len(wetter_reise)
-
-                col1, col2, col3 = st.columns(3)
-
-                col1.metric("Reisetage", anzahl_tage)
-##.1f heisst eine Nachkommastelle
-                col2.metric("Ø Temperatur", f"{durchschnitt_temp:.1f} °C")
-
-                col3.metric("Ø Luftfeuchtigkeit", f"{durchschnitt_feuchtigkeit:.1f} %")
-
-                st.caption(
-                    "Diese Wetterdaten werden später als Grundlage für die Vorhersage der Luftverschmutzung verwendet.")
-
-                st.subheader("Temperatur während der Reise")
-
-                temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
-                temperatur_graph = temperatur_graph.set_index("datum")
-
-                st.line_chart(temperatur_graph)
-
-                st.subheader("Relative Luftfeuchtigkeit während der Reise")
-
-                feuchtigkeit_graph = wetter_reise[["datum", "relative_humidity_mean"]].copy()
-                feuchtigkeit_graph = feuchtigkeit_graph.set_index("datum")
-
-                st.line_chart(feuchtigkeit_graph)
-
-                with st.expander("Wetterdaten als Tabelle anzeigen"):
-                    st.dataframe(
-                        wetter_reise[["datum", "temperature_mean", "relative_humidity_mean"]],
-                        use_container_width=True,
-                        hide_index=True
-                    )
-
-            except Exception as fehler:
-                st.error("❌ Die Wetterdaten konnten nicht geladen werden.")
-                st.write("Fehlermeldung:", fehler)
-
-            st.divider()
-            st.subheader("Vorhergesagte Luftverschmutzung")
-
-            try:
                 location_id = ORT_IDS[ort_name]
                 model, mae = lade_ml_modell(location_id)
                 vorhersage = predict_multiple_days(model, wetter_reise)
-
-
-                st.write("Das Modell schätzt aus den Wetterdaten die Luftverschmutzung für deine Reisetage.")
-                st.caption(f"Durchschnittlicher Modellfehler im Test: {mae:.2f}")
-
-                st.dataframe(
-                    vorhersage[["datum", "pm25", "pm10", "o3"]],
-                    use_container_width=True,
-                    hide_index=True)
-
-                st.subheader("Entwicklung der vorhergesagten Schadstoffe")
-
-                schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
-                schadstoff_graph = schadstoff_graph.set_index("datum")
-
-                st.line_chart(schadstoff_graph)
-
-                st.divider()
-                st.subheader("Tägliche Risikoeinschätzung")
 
                 risiko_scores = []
                 risiko_levels = []
                 farben = []
                 empfehlungen = []
-
-##abschnitt von ChatGPT erstellt:
 
                 for index, zeile in vorhersage.iterrows():
                     risiko_score, risiko_level, farbe, empfehlung = calculate_total_risk(
@@ -328,7 +259,9 @@ elif seite == "Ergebnisse":
 
                 schlimmster_tag = vorhersage.loc[vorhersage["risiko_score"].idxmax()]
 
-##Abschnitt komplett von ChatGPT umgeschrieben und generiert
+                st.divider()
+                st.subheader("Tägliche Risikoeinschätzung")
+
                 emoji, hintergrund_farbe, text_farbe = hole_risiko_design(schlimmster_tag["farbe"])
 
                 st.markdown(
@@ -387,30 +320,107 @@ elif seite == "Ergebnisse":
 
                         with col2:
                             st.markdown(f"**{tag['datum'].strftime('%d.%m.%Y')}**")
-                            st.write(f"Risiko: **{tag['risiko_level']} ** ")
+                            st.write(f"Risiko: **{tag['risiko_level']}**")
 
                         with col3:
                             st.write(tag["empfehlung"])
                             st.caption(
                                 f"PM2.5: {tag['pm25']:.1f} | "
                                 f"PM10: {tag['pm10']:.1f} | "
-                                f"O₃: {tag['o3']:.1f}")
+                                f"O₃: {tag['o3']:.1f}"
+                            )
 
                 with st.expander("Tägliche Risikodaten anzeigen"):
-                    st.dataframe(vorhersage[["datum", "temperature_mean", "relative_humidity_mean", "pm25", "pm10", "o3", "risiko_score", "risiko_level", "farbe"]], use_container_width=True, hide_index=True)
+                    st.dataframe(
+                        vorhersage[[
+                            "datum",
+                            "temperature_mean",
+                            "relative_humidity_mean",
+                            "pm25",
+                            "pm10",
+                            "o3",
+                            "risiko_score",
+                            "risiko_level",
+                            "farbe"
+                        ]],
+                        use_container_width=True,
+                        hide_index=True
+                    )
 
+                st.divider()
+                st.subheader("Vorhergesagte Luftverschmutzung")
 
+                st.write("Das Modell schätzt aus den Wetterdaten die Luftverschmutzung für deine Reisetage.")
+                st.caption(f"Durchschnittlicher Modellfehler im Test: {mae:.2f}")
 
+                st.dataframe(
+                    vorhersage[["datum", "pm25", "pm10", "o3"]],
+                    use_container_width=True,
+                    hide_index=True
+                )
 
+                st.subheader("Entwicklung der vorhergesagten Schadstoffe")
+
+                schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
+                schadstoff_graph = schadstoff_graph.set_index("datum")
+
+                st.line_chart(schadstoff_graph)
+
+                st.divider()
+                st.subheader("Wettervorhersage für deine Reise")
+
+                st.write("Wetterdaten für:", ort_name)
+
+                durchschnitt_temp = wetter_reise["temperature_mean"].mean()
+                durchschnitt_feuchtigkeit = wetter_reise["relative_humidity_mean"].mean()
+                anzahl_tage = len(wetter_reise)
+
+                col1, col2, col3 = st.columns(3)
+
+                col1.metric("Reisetage", anzahl_tage)
+
+                # .1f heisst eine Nachkommastelle
+                col2.metric("Ø Temperatur", f"{durchschnitt_temp:.1f} °C")
+
+                col3.metric("Ø Luftfeuchtigkeit", f"{durchschnitt_feuchtigkeit:.1f} %")
+
+                st.caption(
+                    "Diese Wetterdaten werden später als Grundlage für die Vorhersage der Luftverschmutzung verwendet."
+                )
+
+                st.subheader("Temperatur während der Reise")
+
+                temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
+                temperatur_graph = temperatur_graph.set_index("datum")
+
+                st.line_chart(temperatur_graph)
+
+                st.subheader("Relative Luftfeuchtigkeit während der Reise")
+
+                feuchtigkeit_graph = wetter_reise[["datum", "relative_humidity_mean"]].copy()
+                feuchtigkeit_graph = feuchtigkeit_graph.set_index("datum")
+
+                st.line_chart(feuchtigkeit_graph)
+
+                with st.expander("Wetterdaten als Tabelle anzeigen"):
+                    st.dataframe(
+                        wetter_reise[["datum", "temperature_mean", "relative_humidity_mean"]],
+                        use_container_width=True,
+                        hide_index=True
+                    )
+
+            except ValueError as fehler:
+                st.error("Für diesen Ort gibt es aktuell nicht genügend Daten für das ML-Modell.")
+                st.write("Bitte versuche es mit einem anderen Ort, zum Beispiel Zürich oder Paris.")
+                st.caption(f"Technische Fehlermeldung: {fehler}")
 
             except Exception as fehler:
-                st.error("❌ Die Luftverschmutzung konnte mit dem ML-Modell nicht vorhergesagt werden.")
+                st.error("❌ Die Ergebnisse konnten nicht berechnet werden.")
                 st.write("Fehlermeldung:", fehler)
 
-
-
         else:
-            st.info("Klicke auf den Button, um die Wettervorhersage für deinen Reisezeitraum zu laden.")
+            st.info(
+                "Klicke auf den Button, um Wetterdaten, Luftverschmutzung und dein persönliches Risiko zu berechnen.")
 
     else:
         st.warning("Bitte gehe zuerst auf die Seite Eingaben und speichere deine Angaben.")

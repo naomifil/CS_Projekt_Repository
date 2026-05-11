@@ -32,8 +32,11 @@ def load_data(db_path=DB_PATH):
 
 # Data preparation: transforms raw data into usable daily datasets for ml
 def preprocess_data(air, weather):
-
-    air["timestamp"] = pd.to_datetime(air["timestamp"], utc=True)
+    air["timestamp"] = pd.to_datetime(
+        air["timestamp"],
+        utc=True,
+        format="mixed"
+    )
     air["date"] = air["timestamp"].dt.date
 
     weather["date"] = pd.to_datetime(weather["date"], utc=True).dt.date

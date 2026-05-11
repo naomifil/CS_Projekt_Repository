@@ -16,7 +16,7 @@ All design decisions, testing and integration were performed by the author.
 import streamlit as st
 from datetime import date, timedelta
 import pandas as pd
-from api_and_db import fetch_weather
+from api_and_db import fetch_weather, create_openmeteo_client
 from ml_model_db import train_model_for_city, predict_multiple_days
 from risk_module import calculate_total_risk
 
@@ -73,7 +73,9 @@ def lade_ml_modell(location_id):
 
 @st.cache_data(ttl=300)
 def lade_wetterdaten(lat, lon, forecast_tage):
+    client = create_openmeteo_client()
     wetter = fetch_weather(
+        client,
         lat=lat,
         lon=lon,
         past_days=0,
@@ -503,7 +505,7 @@ elif seite == "Ergebnisse":
 
             except ValueError as fehler:
                 st.error("Für diesen Ort gibt es aktuell nicht genügend Daten für das ML-Modell.")
-                st.write("Bitte versuche es mit einem anderen Ort, zum Beispiel Zürich oder Paris.")
+                st.write("Bitte versuche es mit einem anderen Ort.")
                 st.caption(f"Technische Fehlermeldung: {fehler}")
 
             except Exception as fehler:

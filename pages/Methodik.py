@@ -1,6 +1,19 @@
 import streamlit as st
 
+st.sidebar.markdown("**AirSense**")
+st.sidebar.caption(
+    "AirSense schätzt das persönliche Risiko anhand von Reisedaten, Wettervorhersage, "
+    "ML-Vorhersage der Luftverschmutzung und Gesundheitsangaben."
+)
 
+st.sidebar.divider()
+
+
+
+st.sidebar.markdown("**Ablauf:**")
+st.sidebar.caption("1. Eingaben speichern")
+st.sidebar.caption("2. Ergebnisse laden")
+st.sidebar.caption("3. Methodik nachlesen")
 
 
 st.write("Hier wird erklärt, wie der Risikoscore berechnet wird.")

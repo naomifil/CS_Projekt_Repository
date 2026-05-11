@@ -93,6 +93,7 @@ seite = st.sidebar.selectbox("Wähle eine Seite aus:",
 
 st.sidebar.divider()
 
+st.sidebar.markdown("**AirSense**")
 st.sidebar.caption(
     "AirSense schätzt das persönliche Risiko anhand von Reisedaten, Wettervorhersage, "
     "ML-Vorhersage der Luftverschmutzung und Gesundheitsangaben."
@@ -100,8 +101,7 @@ st.sidebar.caption(
 
 st.sidebar.divider()
 
-st.sidebar.markdown("**AirSense**")
-st.sidebar.caption("Eine einfache App zur Einschätzung von Luftverschmutzungsrisiken vor einer Reise.")
+
 
 st.sidebar.markdown("**Ablauf:**")
 st.sidebar.caption("1. Eingaben speichern")
@@ -136,9 +136,13 @@ if seite == "Startseite":
 
     st.subheader("Mehr über die App")
 
-    st.markdown(
-        "Falls du wissen möchtest, wie diese App funktioniert, kannst du unten 👇 auf den Button **📚 Methodik** klicken.")
-    st.write("Dort wird erklärt, wie die App im Hintergrund arbeitet und wie die Risikoeinschätzung berechnet wird.")
+    st.markdown("""
+        Du hast zwei Möglichkeiten, mehr zu erfahren:
+        - 👈 **Links über dem Menü** auf **Methodik** klicken (immer sichtbar)
+        - 👇 **Unten** auf den Button **Methodik** klicken
+
+        Dort wird erklärt, wie die App im Hintergrund arbeitet und wie die Risikoeinschätzung berechnet wird.
+        """)
     st.page_link("pages/Methodik.py", label="Methodik", icon="📚")
 
 

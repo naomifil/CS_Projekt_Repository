@@ -1,3 +1,18 @@
+"""
+User Interface
+
+This code was rewritten with the assistance of ChatGPT (OpenAI).
+
+The use of AI included:
+- Code structuring and refactoring
+- Debugging support
+- Writing user information texts
+-Code optimization
+
+Section generated entirely by ChatGPT indicated accordingly.
+
+All design decisions, testing and integration were performed by the author.
+"""
 import streamlit as st
 from api_call import fetch_air_quality
 from datetime import date, timedelta
@@ -10,7 +25,7 @@ from risk_module import calculate_total_risk
 
 
 
-##Dictionary code gemacht von ChatGPT
+# --- AI-generated section (ChatGPT/OpenAI)
 ORTE = {
     "Zürich": (8.5417, 47.3769),
     "Paris": (2.3522, 48.8566),
@@ -29,14 +44,16 @@ ORT_IDS = {
     "Brüssel": "6",
     "Stockholm": "7"}
 
+VERFUEGBARE_ORTE = ["Paris", "London", "Frankfurt", "Brüssel", "Stockholm"]
+
 PARAMETER = ["pm25", "pm10", "o3"]
-##Ende ChatGPT
+# --- End AI-generated section ---
 
 MAX_FORECAST_TAGE = 14
 
 MAX_RISIKO_SCORE = 105000
 
-##Funktion mit einzelnen farben von ChatGPT gemacht
+# --- AI-generated section (ChatGPT/OpenAI)
 def hole_risiko_design(farbe):
     if farbe == "Grün":
         return "🟢", "#e8f5e9", "#2e7d32"
@@ -63,6 +80,7 @@ def lade_wetterdaten(lat, lon, forecast_tage):
         past_days=0,
         forecast_days=forecast_tage)
     return wetter
+# --- End AI-generated section ---
 
 st.set_page_config(
     page_title="AirSense",
@@ -72,7 +90,22 @@ st.sidebar.title("Menü")
 seite = st.sidebar.selectbox("Wähle eine Seite aus:",
     ["Startseite", "Eingaben", "Ergebnisse", "Methodik"])
 
+st.sidebar.divider()
 
+st.sidebar.caption(
+    "AirSense schätzt das persönliche Risiko anhand von Reisedaten, Wettervorhersage, "
+    "ML-Vorhersage der Luftverschmutzung und Gesundheitsangaben."
+)
+
+st.sidebar.divider()
+
+st.sidebar.markdown("**AirSense**")
+st.sidebar.caption("Eine einfache App zur Einschätzung von Luftverschmutzungsrisiken vor einer Reise.")
+
+st.sidebar.markdown("**Ablauf:**")
+st.sidebar.caption("1. Eingaben speichern")
+st.sidebar.caption("2. Ergebnisse laden")
+st.sidebar.caption("3. Methodik nachlesen")
 
 
 
@@ -88,7 +121,7 @@ if seite == "Startseite":
 
 
     st.subheader("So benutzt du die App")
-    ## folgender Text für seite (nicht der code) von ChatGPT erstellt
+
     st.markdown("""
     1. 👈 Gehe links im Menü auf **Eingaben**.
     2. Gib dort dein ***Alter***, dein ***Asthma-Level***, dein ***Aktivitätslevel*** und deine ***Reisedaten*** ein.
@@ -104,7 +137,7 @@ if seite == "Startseite":
 
     st.markdown("Falls du wissen möchtest, wie diese App funktioniert, kannst du links im Menü auf die Seite **Methodik** klicken.")
     st.write("Dort wird erklärt, wie die App im Hintergrund arbeitet und wie die Risikoeinschätzung berechnet wird.")
-## ende ChatGPT text
+
 
 
 
@@ -123,7 +156,7 @@ elif seite == "Eingaben":
     st.header("Eingaben")
     st.info("Je genauer die Angaben sind, desto besser kann die App später eine persönliche Einschätzung anzeigen.")
 
-    ## column aufbau mit ChatGPT hergestellt
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -148,7 +181,8 @@ elif seite == "Eingaben":
         max_datum = heute + timedelta(days=MAX_FORECAST_TAGE)
 
         ort = st.selectbox(
-            "Wähle deinen Reiseort:", list(ORTE.keys()))
+            "Wähle deinen Reiseort:",
+            VERFUEGBARE_ORTE)
 
         reise_start = st.date_input("Wann beginnt deine Reise?", min_value=heute, max_value=max_datum)
 
@@ -157,7 +191,7 @@ elif seite == "Eingaben":
             min_value=reise_start, max_value=max_datum)
 
         st.caption("Hinweis: Die App erlaubt aktuell nur Reisedaten innerhalb der nächsten 14 Tage, weil die Wettervorhersage nur für einen begrenzten Zeitraum verfügbar ist.")
-## ende ChatGPT Bearbeitung
+
 
     if st.button("Eingaben speichern"):
         st.session_state["alter"] = alter
@@ -213,7 +247,7 @@ elif seite == "Ergebnisse":
                     lon=lon,
                     forecast_tage=MAX_FORECAST_TAGE
                 )
-
+                # --- AI-generated section (ChatGPT/OpenAI)
                 wetter_tabelle = wetter["daily"]
 
                 wetter_tabelle["datum"] = pd.to_datetime(wetter_tabelle["date"]).dt.date
@@ -287,7 +321,7 @@ elif seite == "Ergebnisse":
                     """,
                     unsafe_allow_html=True
                 )
-
+                # --- End AI-generated section
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
@@ -305,8 +339,27 @@ elif seite == "Ergebnisse":
                 risiko_graph = vorhersage[["datum", "risiko_score"]].copy()
                 risiko_graph = risiko_graph.set_index("datum")
 
-                st.line_chart(risiko_graph)
+                if len(vorhersage) > 1:
+                    st.line_chart(risiko_graph)
+                else:
+                    st.metric("Risiko-Score für diesen Tag", round(schlimmster_tag["risiko_score"], 2))
+                    st.bar_chart(risiko_graph)
 
+                st.subheader("Schadstoffe am kritischsten Tag")
+
+                schadstoffe_schlimmster_tag = pd.DataFrame({
+                    "Schadstoff": ["PM2.5", "PM10", "Ozon"],
+                    "Wert": [
+                        schlimmster_tag["pm25"],
+                        schlimmster_tag["pm10"],
+                        schlimmster_tag["o3"]
+                    ]
+                })
+
+                schadstoffe_schlimmster_tag = schadstoffe_schlimmster_tag.set_index("Schadstoff")
+
+                st.bar_chart(schadstoffe_schlimmster_tag)
+                # --- AI-generated section (OpenAI)
                 st.subheader("Übersicht pro Reisetag")
 
                 for index, tag in vorhersage.iterrows():
@@ -346,7 +399,7 @@ elif seite == "Ergebnisse":
                         use_container_width=True,
                         hide_index=True
                     )
-
+                # --- End AI-generated section
                 st.divider()
                 st.subheader("Vorhergesagte Luftverschmutzung")
 
@@ -359,13 +412,35 @@ elif seite == "Ergebnisse":
                     hide_index=True
                 )
 
-                st.subheader("Entwicklung der vorhergesagten Schadstoffe")
+                st.subheader("Vorhergesagte Schadstoffe")
+                # --- AI-generated section (OpenAI)
+                if len(vorhersage) > 1:
+                    schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
+                    schadstoff_graph = schadstoff_graph.set_index("datum")
 
-                schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
-                schadstoff_graph = schadstoff_graph.set_index("datum")
+                    st.line_chart(schadstoff_graph)
 
-                st.line_chart(schadstoff_graph)
+                else:
+                    einzelner_tag = vorhersage.iloc[0]
 
+                    col1, col2, col3 = st.columns(3)
+
+                    col1.metric("PM2.5", f"{einzelner_tag['pm25']:.1f}")
+                    col2.metric("PM10", f"{einzelner_tag['pm10']:.1f}")
+                    col3.metric("Ozon", f"{einzelner_tag['o3']:.1f}")
+
+                    schadstoffe_einzel_tag = pd.DataFrame({
+                        "Schadstoff": ["PM2.5", "PM10", "Ozon"],
+                        "Wert": [
+                            einzelner_tag["pm25"],
+                            einzelner_tag["pm10"],
+                            einzelner_tag["o3"]
+                        ]
+                    })
+
+                    schadstoffe_einzel_tag = schadstoffe_einzel_tag.set_index("Schadstoff")
+                    st.bar_chart(schadstoffe_einzel_tag)
+                # --- End AI-generated section
                 st.divider()
                 st.subheader("Wettervorhersage für deine Reise")
 
@@ -388,19 +463,37 @@ elif seite == "Ergebnisse":
                     "Diese Wetterdaten werden später als Grundlage für die Vorhersage der Luftverschmutzung verwendet."
                 )
 
-                st.subheader("Temperatur während der Reise")
+                st.subheader("Wetter während der Reise")
 
-                temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
-                temperatur_graph = temperatur_graph.set_index("datum")
+                if len(wetter_reise) > 1:
+                    st.subheader("Temperatur:")
+                    temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
+                    temperatur_graph = temperatur_graph.set_index("datum")
+                    st.line_chart(temperatur_graph)
 
-                st.line_chart(temperatur_graph)
+                    st.subheader("Luftfeuchtigkeit:")
+                    feuchtigkeit_graph = wetter_reise[["datum", "relative_humidity_mean"]].copy()
+                    feuchtigkeit_graph = feuchtigkeit_graph.set_index("datum")
+                    st.line_chart(feuchtigkeit_graph)
 
-                st.subheader("Relative Luftfeuchtigkeit während der Reise")
+                else:
+                    einzelner_tag = wetter_reise.iloc[0]
 
-                feuchtigkeit_graph = wetter_reise[["datum", "relative_humidity_mean"]].copy()
-                feuchtigkeit_graph = feuchtigkeit_graph.set_index("datum")
+                    col1, col2 = st.columns(2)
 
-                st.line_chart(feuchtigkeit_graph)
+                    col1.metric("Temperatur an diesem Tag", f"{einzelner_tag['temperature_mean']:.1f} °C")
+                    col2.metric("Luftfeuchtigkeit an diesem Tag", f"{einzelner_tag['relative_humidity_mean']:.1f} %")
+
+                    wetter_einzel_tag = pd.DataFrame({
+                        "Wetterwert": ["Temperatur", "Luftfeuchtigkeit"],
+                        "Wert": [
+                            einzelner_tag["temperature_mean"],
+                            einzelner_tag["relative_humidity_mean"]
+                        ]
+                    })
+
+                    wetter_einzel_tag = wetter_einzel_tag.set_index("Wetterwert")
+                    st.bar_chart(wetter_einzel_tag)
 
                 with st.expander("Wetterdaten als Tabelle anzeigen"):
                     st.dataframe(
@@ -424,7 +517,7 @@ elif seite == "Ergebnisse":
 
     else:
         st.warning("Bitte gehe zuerst auf die Seite Eingaben und speichere deine Angaben.")
-##Ende ChatGPT Überarbeitung
+
 
 
 
@@ -450,7 +543,7 @@ else:
     st.write("""
     AirSense hilft Menschen mit Asthma zu erkennen, wann Aktivitäten im Freien ein erhöhtes Risiko darstellen können. 
     Die App kombiniert Daten zur Luftqualität, Wetterdaten und persönliche 
-    Gesundheitsinformationen, um einen individuellen Risk-Score zu berechnen.
+    Gesundheitsinformationen, um einen individuellen Risiko-Score zu berechnen.
     """)
 
     with st.expander("**Das Problem**"):
@@ -474,16 +567,16 @@ else:
         st.write("""
         - sammelt Echtzeitdaten zur Luftqualität und zum Wetter
         - kombiniert diese mit dem Gesundheitsprofil des Nutzers
-        - berechnet daraus einen personalisierten Asthma Risk-Score
+        - berechnet daraus einen personalisierten Asthma Risiko-Score
         - stellt das Ergebnis klar und verständlich dar
         """)
 
     st.divider()
 
-    st.header("Einflussfaktoren auf den Risk-Score")
+    st.header("Einflussfaktoren auf den Risiko-Score")
 
     st.write(
-        """Der Risk-Score wird aus einer Kombination von Umweltfaktoren und persönlichen Faktoren berechnet. Dazu gehören:""")
+        """Der Risiko-Score wird aus einer Kombination von Umweltfaktoren und persönlichen Faktoren berechnet. Dazu gehören:""")
 
     # Umweltfaktoren
     st.subheader("Umweltfaktoren")
@@ -594,7 +687,7 @@ else:
 
     st.divider()
 
-    st.header("Berechnung des Risk-Scores")
+    st.header("Berechnung des Risiko-Scores")
     with st.expander("**Umweltfaktoren**"):
 
         st.write("""
@@ -738,3 +831,4 @@ else:
 
     with st.expander("**Hilfsmittel**"):
         st.write("Deepl Translate")
+

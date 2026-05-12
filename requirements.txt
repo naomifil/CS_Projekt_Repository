@@ -13,4 +13,4 @@ requests-cache  # caching API calls (for rate limit of air quality api)
 retry-requests  # auto-retry failed request
 
 ## Machine Learning
-scikit-learn
+scikit-learn # ml library (training, data splitting, evaluation)

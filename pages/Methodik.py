@@ -72,7 +72,69 @@ with st.expander("**Die Lösung**"):
         """)
 
 st.divider()
+#Machine learning: explanation of model
+st.header("Machine Learning Modell zur Luftverschmutzungsvorhersage")
 
+st.write("""
+Das Ziel des überwachten Machine Learning Modells ist es, die Luftverschmutzungsbelastung 
+auf Basis von Wetterdaten vorherzusagen. Genauer gesagt schätzt das Modell die Werte 
+von **PM2.5, PM10 und O₃** mithilfe von Temperatur- und Luftfeuchtigkeitsdaten.
+""")
+
+with st.expander("**Datenvorverarbeitung**"):
+    st.write("""
+    Die aus einer SQLite-Datenbank geladenen Rohdaten wurden vor dem Training vorverarbeitet:
+    - Luftqualitätsmessungen wurden zu **Tagesmittelwerten** zusammengefasst
+    - Zeitstempel wurden **standardisiert**
+    - Wetterdaten und Schadstoffdaten wurden anhand von **Standort und Datum** zu einem einzigen Datensatz zusammengeführt
+    """)
+
+with st.expander("**Feature-Auswahl**"):
+    st.write("""
+    Das Modell lernt die Beziehungen zwischen **Wetterbedingungen** und **Verschmutzungswerten**.
+
+    **Temperatur** und **Luftfeuchtigkeit** wurden als Eingangsmerkmale ausgewählt, 
+    weil dies die einzigen verfügbaren Umweltvariablen im Datensatz sind, die für die 
+    Vorhersage der Zielvariablen relevant sind.
+    """)
+
+with st.expander("**Decision Tree Regressor**"):
+    st.write("""
+    Das Modell verwendet einen **Decision Tree Regressor** (Entscheidungsbaum-Regressor). 
+    Es lernt Entscheidungsregeln aus historischen Daten, indem es den Datensatz wiederholt 
+    basierend auf den Wetterbedingungen aufteilt.
+
+    Während des Trainings vergleicht das Modell die vorhergesagten Verschmutzungswerte 
+    mit den tatsächlichen historischen Werten und passt seine internen Entscheidungsregeln 
+    an, um den Vorhersagefehler zu reduzieren.
+    """)
+
+with st.expander("**Modellbewertung**"):
+    st.write("""
+    Die Genauigkeit des Modells wurde mit dem **Mean Absolute Error (MAE)** bewertet.
+    Der MAE misst die durchschnittliche Differenz zwischen vorhergesagten und 
+    tatsächlichen Verschmutzungswerten.
+
+    Je kleiner der MAE, desto genauer ist das Modell.
+    """)
+
+with st.expander("**Vorhersagen**"):
+    st.write("""
+    Nach dem Training kann das Modell zukünftige Verschmutzungswerte basierend auf 
+    vorhergesagten Wetterbedingungen berechnen. Dies umfasst:
+    - **Ein-Tages-Vorhersagen**
+    - **Mehr-Tages-Vorhersagen**
+    """)
+with st.expander(":orange[**⚠ Aktuelle Einschränkungen ⚠**]"):
+    st.write("""
+    Das Modell verwendet derzeit **nur Temperatur und Luftfeuchtigkeit** als Merkmale.
+
+    Da das Modell auf diese beiden Einflussfaktoren begrenzt ist, kann dies die 
+    Vorhersageleistung einschränken. Die Erkundung höherdimensionaler Merkmalsräume 
+    (mit mehr Einflussfaktoren) ist mit dem aktuellen Modell nicht möglich.
+    """)
+
+st.divider()
 # Risk factors: introduces the environmental and personal variables used in the score
 st.header("Einflussfaktoren auf den Risiko-Score")
 

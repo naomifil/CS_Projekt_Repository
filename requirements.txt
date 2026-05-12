@@ -2,7 +2,7 @@
 
 pandas # data handling
 python-dotenv # loads .env for API key
-streamlit # for app interface$
+streamlit # for app interface
 
 ## API client
 openaq # air quality data
@@ -13,4 +13,4 @@ requests-cache  # caching API calls (for rate limit of air quality api)
 retry-requests  # auto-retry failed request
 
 ## Machine Learning
-scikit-learn
+scikit-learn # ml library (training, data splitting, evaluation)

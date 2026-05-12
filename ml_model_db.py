@@ -7,7 +7,7 @@ The use of AI included:
 - Code structuring and refactoring
 - Debugging support
 
-Section generated entirely by ChatGPT indicated accordingly.
+Sections generated entirely by ChatGPT indicated accordingly.
 
 All design decisions, testing and integration were performed by the author.
 """
@@ -32,11 +32,7 @@ def load_data(db_path=DB_PATH):
 
 # Data preparation: transforms raw data into usable daily datasets for ml
 def preprocess_data(air, weather):
-    air["timestamp"] = pd.to_datetime(
-        air["timestamp"],
-        utc=True,
-        format="mixed"
-    )
+    air["timestamp"] = pd.to_datetime(air["timestamp"], utc=True, format="mixed")
     air["date"] = air["timestamp"].dt.date
 
     weather["date"] = pd.to_datetime(weather["date"], utc=True).dt.date
@@ -44,22 +40,13 @@ def preprocess_data(air, weather):
     air["location_id"] = air["location_id"].astype(str)
     weather["location_id"] = weather["location_id"].astype(str)
 
-    air_daily = air.groupby(["location_id", "date"]).agg({
-        "pm25": "mean",
-        "pm10": "mean",
-        "o3": "mean"
-    }).reset_index()
+    air_daily = air.groupby(["location_id", "date"]).agg({"pm25": "mean", "pm10": "mean", "o3": "mean"}).reset_index()
 
     return air_daily, weather
 
 # Merge datasets: creates a single dataset containing both weather features and air pollution measurements
 def merge_data(air_daily, weather):
-    data = pd.merge(
-        weather,
-        air_daily,
-        on=["location_id", "date"],
-        how="inner"
-    )
+    data = pd.merge(weather, air_daily, on=["location_id", "date"], how="inner")
 
     if data.empty:
         raise ValueError("Merged dataset is empty. Check your DB data.")
@@ -97,14 +84,9 @@ def train_model_for_city(location_id, db_path=DB_PATH):
 
     X, y = prepare_features(data)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    model = DecisionTreeRegressor(
-        max_depth=5,
-        random_state=42
-    )
+    model = DecisionTreeRegressor(max_depth=5, random_state=42)
 
     model.fit(X_train, y_train)
 
@@ -126,27 +108,17 @@ def evaluate_model(model, X_test, y_test):
 
 # Single future prediction: allows model to estimate future air quality using new weather input data for a single day
 def predict_future(model, temperature, humidity):
-    future_weather = pd.DataFrame(
-        [[temperature, humidity]],
-        columns=["temperature_mean", "relative_humidity_mean"]
-    )
+    future_weather = pd.DataFrame([[temperature, humidity]], columns=["temperature_mean", "relative_humidity_mean"])
 
     future_pred = model.predict(future_weather)
 
-    return {
-        "pm25": future_pred[0][0],
-        "pm10": future_pred[0][1],
-        "o3": future_pred[0][2]
-    }
+    return {"pm25": future_pred[0][0], "pm10": future_pred[0][1], "o3": future_pred[0][2]}
 
 # Multi-day future prediction: allows model to estimate future air quality using new weather input data for multiple days
 # --- AI-generated section (ChatGPT/OpenAI) ---
 def predict_multiple_days(model, weather_df):
 
-    X = weather_df[[
-        "temperature_mean",
-        "relative_humidity_mean"
-    ]]
+    X = weather_df[["temperature_mean", "relative_humidity_mean"]]
 
     preds = model.predict(X)
 

@@ -7,7 +7,7 @@ The use of AI included:
 - Code structuring and refactoring
 - Debugging support
 
-Section generated entirely by ChatGPT indicated accordingly.
+Sections generated entirely by ChatGPT indicated accordingly.
 
 All design decisions, testing and integration were performed by the author.
 """

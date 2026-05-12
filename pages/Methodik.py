@@ -1,23 +1,43 @@
+"""
+AirSense – Methodik Page
+
+This Streamlit user interface was developed by the author and partially supported
+with AI assistance from ChatGPT (OpenAI).
+
+The use of AI included:
+- Improving readability and code comments
+- Writing and revising user-facing information texts
+
+Sections generated entirely by ChatGPT are indicated accordingly.
+
+All design decisions, testing, integration, final adjustments and responsibility
+for the submitted version were carried out by the author.
+"""
+
 import streamlit as st
 
+# Page setup: defines general Streamlit layout and browser title
+st.set_page_config(
+    page_title="Methodik AirSense",
+    page_icon=":books:", # 📚 Bücher-Emoji
+    layout="wide")
+
+# Sidebar: repeats the app description and basic workflow on the methodology page
 st.sidebar.markdown("**AirSense**")
 st.sidebar.caption(
     "AirSense schätzt das persönliche Risiko anhand von Reisedaten, Wettervorhersage, "
-    "ML-Vorhersage der Luftverschmutzung und Gesundheitsangaben."
-)
+    "ML-Vorhersage der Luftverschmutzung und Gesundheitsangaben.")
 
 st.sidebar.divider()
-
-
 
 st.sidebar.markdown("**Ablauf:**")
 st.sidebar.caption("1. Eingaben speichern")
 st.sidebar.caption("2. Ergebnisse laden")
 st.sidebar.caption("3. Methodik nachlesen")
 
-
+# Page introduction: gives a short overview of what AirSense does
 st.write("Hier wird erklärt, wie der Risikoscore berechnet wird.")
-## von Frieda
+
 st.title("About AirSense")
 
 st.write("""
@@ -25,7 +45,7 @@ AirSense hilft Menschen mit Asthma zu erkennen, wann Aktivitäten im Freien ein 
 Die App kombiniert Daten zur Luftqualität, Wetterdaten und persönliche 
 Gesundheitsinformationen, um einen individuellen Risiko-Score zu berechnen.
 """)
-
+# Problem section: explains why this app can be useful for people with asthma
 with st.expander("**Das Problem**"):
 
     st.write("Menschen mit Asthma haben oft Schwierigkeiten damit:")
@@ -36,7 +56,7 @@ with st.expander("**Das Problem**"):
         - Ihr persönliches Risiko zu bewerten (jeder reagiert unterschiedlich)
         - Wetter, Luftverschmutzung und Gesundheit miteinander zu verbinden
         """)
-
+# Solution section: shows how the app tries to solve the problem
 with st.expander("**Die Lösung**"):
 
     st.write(
@@ -53,12 +73,13 @@ with st.expander("**Die Lösung**"):
 
 st.divider()
 
+# Risk factors: introduces the environmental and personal variables used in the score
 st.header("Einflussfaktoren auf den Risiko-Score")
 
 st.write(
         """Der Risiko-Score wird aus einer Kombination von Umweltfaktoren und persönlichen Faktoren berechnet. Dazu gehören:""")
 
-    # Umweltfaktoren
+
 st.subheader("Umweltfaktoren")
 
 st.markdown("##### Luftverschmutzung")
@@ -67,6 +88,7 @@ st.write("""
     wenn man bereits an Asthma leidet.
     """)
 
+# Particulate matter explanation: explains why PM2.5 and PM10 matter for asthma risk
 with st.expander("**PM2.5 und PM10**"):
     st.write("""
         PM steht für „Particulate Matter“ (Feinstaub), diese Partikel können aus vielen verschiedenen Chemikalien bestehen.
@@ -92,6 +114,7 @@ with st.expander("**PM2.5 und PM10**"):
         Bei Menschen mit Asthma können diese Feinstaubpartikel die Atemwege reizen und Asthmasymptome verschlimmern.
         """)
 
+# Ozone explanation: explains how ground-level ozone can affect breathing and asthma symptoms
 with st.expander("**O3**"):
 
     st.write("""
@@ -103,6 +126,7 @@ with st.expander("**O3**"):
 
 st.markdown("##### Wetterbedingungen")
 
+# Temperature explanation: explains why very cold or hot weather can influence asthma
 with st.expander("**Temperatur**"):
     st.write("""
         Kalte und heisse Temperaturen können Asthmasymptome auslösen. Kalte, trockene Luft kann die Atemwege irritieren, 
@@ -110,12 +134,14 @@ with st.expander("**Temperatur**"):
         indem sie die Luftverschmutzung und die Konzentration von Allergenen erhöht, die die Lunge reizen.
         """)
 
+# Humidity explanation: explains why humidity is included in the risk calculation
 with st.expander("**Luftfeuchtigkeit**"):
     st.write("""
         Auch Luftfeuchtigkeit kann Asthma beeinflussen. Feuchte Luft ist schwerer und begünstigt Allergene wie Schimmel und Staubmilben.
         Zudem kann sie die Luftverschmutzung verschlimmern und Symptome auslösen. Sehr trockene Luft kann auch die Atemwege reizen und zu Atembeschwerden führen.
         """)
 
+# Personal factors: explains why the same pollution level can affect people differently
 st.subheader("Persönliche Faktoren")
 st.write("""
     Persönliche Faktoren spielen eine wichtige Rolle dabei, wie stark sich Umweltbedingungen auf Menschen mit Asthma auswirken. 
@@ -164,9 +190,9 @@ with st.expander("**Asthma-Schweregrade**"):
                - Symptome während dem Tag treten den ganzen Tag über an, Symptome in der Nacht sind häufig
                - Starke Einschränkung der alltäglichen Aktivitäten
                """)
-
 st.divider()
 
+# Score calculation: explains how the final risk score is built from different weighted factors
 st.header("Berechnung des Risiko-Scores")
 with st.expander("**Umweltfaktoren**"):
 
@@ -222,6 +248,7 @@ with st.expander("**Persönliche Faktoren**"):
         - Schwer persistent (Faktor von 4.0)
         """)
 
+# Risk thresholds: explains how the final score is translated into readable risk levels
 with st.expander("**Endergebnis und Risikoschwellwerte**"):
     st.write(
             "Alle Punkte werden mit ihren Gewichten multipliziert und zu einer Gesamtrisikobewertung zusammengerechnet.")
@@ -251,6 +278,7 @@ with st.expander("**Endergebnis und Risikoschwellwerte**"):
     st.write(
             ":violet-background[Extreme Gefahr. Akutes Risiko eines schweren Asthmaanfalls. Aufenthalt im Freien vermeiden, Fenster schließen, körperliche Ruhe.]")
 
+# Warning: makes clear that the app only gives an estimate and is not medical advice
 with st.expander(":orange[**⚠ User Warning ⚠**]"):
     st.write("Diese App ist kein medizinisches Hilfsmittel.")
     st.write("""
@@ -261,7 +289,7 @@ with st.expander(":orange[**⚠ User Warning ⚠**]"):
        """)
 
 st.divider()
-
+# Sources: lists the sources and tools used for the methodology page
 st.header("Zusätzliche Informationen")
 with st.expander("**Quellen**"):
     st.write("""

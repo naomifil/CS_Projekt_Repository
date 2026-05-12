@@ -1,18 +1,24 @@
 """
-User Interface
+AirSense – User Interface
 
-This code was rewritten with the assistance of ChatGPT (OpenAI).
+This Streamlit user interface was developed by the author and partially supported
+with AI assistance from ChatGPT (OpenAI).
 
 The use of AI included:
-- Code structuring and refactoring
+- Structuring and refactoring selected code sections
 - Debugging support
-- Writing user information texts
--Code optimization
+- Improving readability and code comments
+- Writing and revising user-facing information texts and code explanations
+- Optimizing selected repeated UI and data-processing logic
 
-Section generated entirely by ChatGPT indicated accordingly.
+Sections that were generated or substantially rewritten with the help of ChatGPT
+are marked directly in the code with:
+    # --- AI-assisted section (ChatGPT/OpenAI)
 
-All design decisions, testing and integration were performed by the author.
+All design decisions, testing, integration, final adjustments and responsibility
+for the submitted version were carried out by the author.
 """
+
 import streamlit as st
 from datetime import date, timedelta
 import pandas as pd
@@ -20,11 +26,14 @@ from api_and_db import fetch_weather, create_openmeteo_client
 from ml_model_db import train_model_for_city, predict_multiple_days
 from risk_module import calculate_total_risk
 
+# Page setup: defines general Streamlit layout and browser title
+st.set_page_config(
+    page_title="AirSense",
+    page_icon=":earth_africa:", # 🌍 Erde Emoji
+    layout="wide")
 
-
-
-
-# --- AI-generated section (ChatGPT/OpenAI)
+# Basic city data: stores coordinates and ids needed for weather API and machine learning model
+# --- AI-generated section (ChatGPT/OpenAI) ---
 ORTE = {
     "Zürich": (8.5417, 47.3769),
     "Paris": (2.3522, 48.8566),
@@ -33,7 +42,7 @@ ORTE = {
     "Frankfurt": (8.6821, 50.1109),
     "Brüssel": (4.3517, 50.8503),
     "Stockholm": (18.0686, 59.3293)}
-## für das ML modell
+## for the ML model
 ORT_IDS = {
     "Paris": "1",
     "Zürich": "2",
@@ -52,7 +61,8 @@ MAX_FORECAST_TAGE = 14
 
 MAX_RISIKO_SCORE = 105000
 
-# --- AI-generated section (ChatGPT/OpenAI)
+# Risk design: returns fitting colours and emoji for the different risk levels
+# --- AI-generated section (ChatGPT/OpenAI) ---
 def hole_risiko_design(farbe):
     if farbe == "Grün":
         return "🟢", "#e8f5e9", "#2e7d32"
@@ -65,12 +75,13 @@ def hole_risiko_design(farbe):
     else:
         return "🟣", "#f3e5f5", "#6a1b9a"
 
-##damit das ML nicht bei jedem rerun neu trainiert wird, merkt sich streamlit das trainierte modell durch cache funktion
+# Cache ml model: avoids retraining the model after every Streamlit rerun
 @st.cache_resource
 def lade_ml_modell(location_id):
     model, mae, predictions = train_model_for_city(location_id)
     return model, mae
 
+# Cache weather data: loads forecast data and stores it temporarily for better app performance
 @st.cache_data(ttl=300)
 def lade_wetterdaten(lat, lon, forecast_tage):
     client = create_openmeteo_client()
@@ -83,10 +94,8 @@ def lade_wetterdaten(lat, lon, forecast_tage):
     return wetter
 # --- End AI-generated section ---
 
-st.set_page_config(
-    page_title="AirSense",
-    layout="wide")
 
+# Sidebar navigation: lets the user switch between the main app pages
 st.sidebar.title("Menü")
 seite = st.sidebar.selectbox("Wähle eine Seite aus:",
     ["Startseite", "Eingaben", "Ergebnisse"])
@@ -109,7 +118,7 @@ st.sidebar.caption("2. Ergebnisse laden")
 st.sidebar.caption("3. Methodik nachlesen")
 
 
-
+# Start page: explains the idea of the app and how the user should use it
 if seite == "Startseite":
     st.title("AirSense: eine Luftqualitäts-App für Reisen")
     st.header("Startseite")
@@ -143,13 +152,11 @@ if seite == "Startseite":
 
         Dort wird erklärt, wie die App im Hintergrund arbeitet und wie die Risikoeinschätzung berechnet wird.
         """)
+
+    # Methodik button: links to the extra page where users can read how the app works in the background
     st.page_link("pages/Methodik.py", label="Methodik", icon="📚")
 
-
-
-
-
-
+# Input page: collects personal and travel data needed for the risk calculation
 elif seite == "Eingaben":
     st.write("Hier kannst du deine Daten eingeben.")
 
@@ -162,9 +169,10 @@ elif seite == "Eingaben":
     st.header("Eingaben")
     st.info("Je genauer die Angaben sind, desto besser kann die App später eine persönliche Einschätzung anzeigen.")
 
-
+    # Setup: two columns for input
     col1, col2 = st.columns(2)
 
+    # Personal input: asks for health-related information that influences the final risk score
     with col1:
         st.subheader("Persönliche Angaben")
         st.caption("Diese Angaben helfen einzuschätzen, wie empfindlich du reagieren könntest.")
@@ -179,6 +187,7 @@ elif seite == "Eingaben":
             "Wie aktiv möchtest du in den Ferien sein?",
             ["Nicht aktiv", "Aktiv", "Sehr aktiv"])
 
+    # Travel input: asks for destination and travel dates within the available forecast range
     with col2:
         st.subheader("Reiseangaben")
         st.caption("Diese Angaben beschreiben, wohin und wann du reisen möchtest.")
@@ -198,7 +207,7 @@ elif seite == "Eingaben":
 
         st.caption("Hinweis: Die App erlaubt aktuell nur Reisedaten innerhalb der nächsten 14 Tage, weil die Wettervorhersage nur für einen begrenzten Zeitraum verfügbar ist.")
 
-
+    # Save inputs: stores user data in session state so it can be used on the results page
     if st.button("Eingaben speichern"):
         st.session_state["alter"] = alter
         st.session_state["asthma_level"] = asthma_level
@@ -210,22 +219,14 @@ elif seite == "Eingaben":
 
     st.info("Wenn du alle Daten eingegeben hast, kannst du links im Menü auf Ergebnisse klicken, um deine Risikoeinschätzung zu sehen.")
 
-
-
-
-
-
-
-
-
-
-
+# Results page: loads weather data, predicts air pollution and calculates the personal risk score
 else:
     st.write("Hier kannst du dir deine Ergebnisse anschauen.")
     st.title("Deine persönliche Risikoeinschätzung")
 
     if "alter" in st.session_state:
 
+        # Saved input overview: shows the user which data will be used for the calculation
         st.subheader("Gespeicherte Eingaben")
         st.write("Stimmen diese Daten? Du kannst auf 'Eingaben' zurückgehen, um etwas zu ändern.")
 
@@ -246,6 +247,7 @@ else:
         ort_name = st.session_state["ort"]
         lon, lat = ORTE[ort_name]
 
+        # Weather data: loads forecast data for the selected destination
         if st.button("Ergebnisse laden"):
             try:
                 wetter = lade_wetterdaten(
@@ -253,6 +255,7 @@ else:
                     lon=lon,
                     forecast_tage=MAX_FORECAST_TAGE
                 )
+                # Data filtering and prediction: keeps only travel days and predicts pollutant levels
                 # --- AI-generated section (ChatGPT/OpenAI)
                 wetter_tabelle = wetter["daily"]
 
@@ -299,6 +302,7 @@ else:
 
                 schlimmster_tag = vorhersage.loc[vorhersage["risiko_score"].idxmax()]
 
+                # Main result card: highlights the most critical day of the trip
                 st.divider()
                 st.subheader("Tägliche Risikoeinschätzung")
 
@@ -328,6 +332,7 @@ else:
                     unsafe_allow_html=True
                 )
                 # --- End AI-generated section
+                # Result metrics: gives a quick overview of the most important values
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
@@ -340,6 +345,7 @@ else:
                 with col3:
                     st.metric("Risikostufe", schlimmster_tag["risiko_level"])
 
+                # Risk chart: shows how the personal risk changes over the travel period
                 st.subheader("Risikoverlauf während der Reise")
 
                 risiko_graph = vorhersage[["datum", "risiko_score"]].copy()
@@ -351,6 +357,7 @@ else:
                     st.metric("Risiko-Score für diesen Tag", round(schlimmster_tag["risiko_score"], 2))
                     st.bar_chart(risiko_graph)
 
+                # Pollutants on worst day: shows which pollution values were predicted on the most critical day
                 st.subheader("Schadstoffe am kritischsten Tag")
 
                 schadstoffe_schlimmster_tag = pd.DataFrame({
@@ -363,9 +370,10 @@ else:
                 })
 
                 schadstoffe_schlimmster_tag = schadstoffe_schlimmster_tag.set_index("Schadstoff")
-
                 st.bar_chart(schadstoffe_schlimmster_tag)
-                # --- AI-generated section (OpenAI)
+
+                # Daily overview: shows a short recommendation for every travel day
+                # --- AI-generated section (ChatGPT/OpenAI) ---
                 st.subheader("Übersicht pro Reisetag")
 
                 for index, tag in vorhersage.iterrows():
@@ -405,7 +413,8 @@ else:
                         use_container_width=True,
                         hide_index=True
                     )
-                # --- End AI-generated section
+                # --- End AI-generated section ---
+                # Pollution prediction: displays the air pollution values predicted by the ml model
                 st.divider()
                 st.subheader("Vorhergesagte Luftverschmutzung")
 
@@ -419,7 +428,9 @@ else:
                 )
 
                 st.subheader("Vorhergesagte Schadstoffe")
-                # --- AI-generated section (OpenAI)
+                # Pollution chart: visualizes predicted pollutant values for one or multiple travel days
+                # --- AI-generated section --> AI used to restructure from line chart only to bar chart for one day trips (ChatGPT/OpenAI) ---
+
                 if len(vorhersage) > 1:
                     schadstoff_graph = vorhersage[["datum", "pm25", "pm10", "o3"]].copy()
                     schadstoff_graph = schadstoff_graph.set_index("datum")
@@ -446,7 +457,8 @@ else:
 
                     schadstoffe_einzel_tag = schadstoffe_einzel_tag.set_index("Schadstoff")
                     st.bar_chart(schadstoffe_einzel_tag)
-                # --- End AI-generated section
+                # --- End AI-generated section ---
+                # Weather output: shows the weather data that was used as model input
                 st.divider()
                 st.subheader("Wettervorhersage für deine Reise")
 
@@ -460,7 +472,7 @@ else:
 
                 col1.metric("Reisetage", anzahl_tage)
 
-                # .1f heisst eine Nachkommastelle
+
                 col2.metric("Ø Temperatur", f"{durchschnitt_temp:.1f} °C")
 
                 col3.metric("Ø Luftfeuchtigkeit", f"{durchschnitt_feuchtigkeit:.1f} %")
@@ -470,7 +482,7 @@ else:
                 )
 
                 st.subheader("Wetter während der Reise")
-
+                # --- AI-generated section --> AI used to restructure from line chart only to bar chart for one day trips (ChatGPT/OpenAI) ---
                 if len(wetter_reise) > 1:
                     st.subheader("Temperatur:")
                     temperatur_graph = wetter_reise[["datum", "temperature_mean"]].copy()
@@ -500,7 +512,7 @@ else:
 
                     wetter_einzel_tag = wetter_einzel_tag.set_index("Wetterwert")
                     st.bar_chart(wetter_einzel_tag)
-
+                # --- End AI-generated section ---
                 with st.expander("Wetterdaten als Tabelle anzeigen"):
                     st.dataframe(
                         wetter_reise[["datum", "temperature_mean", "relative_humidity_mean"]],
@@ -508,6 +520,7 @@ else:
                         hide_index=True
                     )
 
+            # Error handling: gives understandable feedback if data or calculations fail
             except ValueError as fehler:
                 st.error("Für diesen Ort gibt es aktuell nicht genügend Daten für das ML-Modell.")
                 st.write("Bitte versuche es mit einem anderen Ort.")
@@ -523,22 +536,4 @@ else:
 
     else:
         st.warning("Bitte gehe zuerst auf die Seite Eingaben und speichere deine Angaben.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -166,6 +166,7 @@ elif seite == "Eingaben":
 
     st.divider()
 
+
     st.header("Eingaben")
     st.info("Je genauer die Angaben sind, desto besser kann die App später eine persönliche Einschätzung anzeigen.")
 

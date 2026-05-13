@@ -177,15 +177,22 @@ elif seite == "Eingaben":
         st.subheader("Persönliche Angaben")
         st.caption("Diese Angaben helfen einzuschätzen, wie empfindlich du reagieren könntest.")
 
-        alter = st.number_input("Wie alt bist du?", min_value=0, max_value=100)
+        alter = st.number_input("Wie alt bist du?", min_value=0, max_value=100, value=st.session_state.get("alter", 0))
+
+        asthma_optionen = ["Kein Asthma", "Leicht", "Mittel", "Stark"]
 
         asthma_level = st.selectbox(
             "Wie stark ist dein Asthma?",
-            ["Kein Asthma", "Leicht", "Mittel", "Stark"])
+            asthma_optionen,
+            index=asthma_optionen.index(st.session_state.get("asthma_level", "Kein Asthma")))
+
+        aktivitaet_optionen = ["Nicht aktiv", "Aktiv", "Sehr aktiv"]
 
         aktivitaet = st.selectbox(
             "Wie aktiv möchtest du in den Ferien sein?",
-            ["Nicht aktiv", "Aktiv", "Sehr aktiv"])
+            aktivitaet_optionen,
+            index=aktivitaet_optionen.index(st.session_state.get("aktivitaet", "Nicht aktiv")))
+
 
     # Travel input: asks for destination and travel dates within the available forecast range
     with col2:
@@ -197,15 +204,29 @@ elif seite == "Eingaben":
 
         ort = st.selectbox(
             "Wähle deinen Reiseort:",
-            VERFUEGBARE_ORTE)
+            VERFUEGBARE_ORTE,
+            index=VERFUEGBARE_ORTE.index(st.session_state.get("ort", VERFUEGBARE_ORTE[0])))
 
-        reise_start = st.date_input("Wann beginnt deine Reise?", min_value=heute, max_value=max_datum)
+        reise_start = st.date_input("Wann beginnt deine Reise?", min_value=heute, max_value=max_datum, value=st.session_state.get("reise_start", heute))
+
+        gespeichertes_ende = st.session_state.get("reise_ende", reise_start)
+
+        if gespeichertes_ende < reise_start:
+            gespeichertes_ende = reise_start
 
         reise_ende = st.date_input(
             "Wann endet deine Reise?",
-            min_value=reise_start, max_value=max_datum)
+            min_value=reise_start,
+            max_value=max_datum,
+            value=gespeichertes_ende)
 
-        st.caption("Hinweis: Die App erlaubt aktuell nur Reisedaten innerhalb der nächsten 14 Tage, weil die Wettervorhersage nur für einen begrenzten Zeitraum verfügbar ist.")
+    st.caption("Hinweis: ")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.caption("1. Die App erlaubt aktuell nur Reisedaten innerhalb der nächsten 14 Tage, weil die Wettervorhersage nur für einen begrenzten Zeitraum verfügbar ist.")
+    with col2:
+        st.caption("2. Es werden nur Orte angezeigt, für die aktuell genügend Trainingsdaten für das ML-Modell vorhanden sind.")
+
 
     # Save inputs: stores user data in session state so it can be used on the results page
     if st.button("Eingaben speichern"):
@@ -522,8 +543,8 @@ else:
 
             # Error handling: gives understandable feedback if data or calculations fail
             except ValueError as fehler:
-                st.error("Für diesen Ort gibt es aktuell nicht genügend Daten für das ML-Modell.")
-                st.write("Bitte versuche es mit einem anderen Ort.")
+                st.error("Die Daten konnten vom ML-Modell nicht richtig verarbeitet werden.")
+                st.write("Bitte überprüfe deine Eingaben oder versuche es mit einem anderen Ort.")
                 st.caption(f"Technische Fehlermeldung: {fehler}")
 
             except Exception as fehler:

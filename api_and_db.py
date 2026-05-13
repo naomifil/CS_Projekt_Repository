@@ -74,7 +74,7 @@ def create_tables():
         UNIQUE(location_id, timestamp)
     )
     """)    # station count -> we set a limit of max. 3 stations per location and only included stations
-            # in a radius of 25km that measure all 3 features to avoid missing data
+            # in a radius of 20km that measure all 3 features to avoid missing data
 
     # weather_daily includes historical data and forecast from API
     cursor.execute("""

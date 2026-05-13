@@ -38,8 +38,8 @@ higher-dimensional feature spaces.
 ### Risk calculation and UI
 User inputs include destination, age, asthma level, planned activity levels, start of trip and end date which 
 are used to calculate the risk score together with the data from our db and our ml
-forecast. The process is explained on our `about_page.py`. App returns daily risk scores graphically and tabular as
-well as air quality adn weather data for the duration of the trip for user to better comprehend results. 
+forecast. The process is explained on our about page on the app. App returns daily risk scores graphically and tabular 
+as well as air quality adn weather data for the duration of the trip for user to better comprehend results. 
 
 
   

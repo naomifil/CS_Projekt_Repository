@@ -6,12 +6,10 @@ By combining live pollution data, weather forecasts, and machine learning, the a
 scores for people with asthma or other respiratory conditions.
 
 ### Architecture
-OpenAQ API ─┐
-            ├── SQLite Database ──> ML Forecast Model ──> Risk Engine ──> Streamlit UI
-OpenMeteo ──┘
+OpenAQ API and OpenMeteo ──> SQLite Database ──> ML Forecast Model ──> Risk Engine ──> Streamlit UI
 
-* Run application: streamlit run AirSense.py
-* Update API and database data: python api_and_db.py
+* Run application: `streamlit run AirSense.py`
+* Update API and database data: `python api_and_db.py`
 
 ## Features
 ### API Data
